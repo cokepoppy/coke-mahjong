@@ -1,0 +1,3282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vita Mahjong — Mobile Pixel Replica</title>
+  <style>
+    /* =====================================================================
+       1. OUTER STUDIO BACKDROP & STRICT MOBILE PHONE VIEWPORT (9:19.5)
+       ===================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at 50% 50%, #14241c 0%, #070d0a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Subtle floating helper dock in bottom-right of desktop backdrop */
+    .outer-floating-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .outer-floating-bar:hover {
+      opacity: 1;
+    }
+
+    /* Mobile Phone Viewport Container */
+    #phone-viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 400px;
+      max-height: 856px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 0 0 7px #1b241f, 0 0 0 9px #394b41;
+      border-radius: 34px;
+      background: radial-gradient(circle at 50% 42%, #1d7c59 0%, #0e523a 58%, #062b1e 100%);
+    }
+
+    @media (max-width: 440px) {
+      #phone-viewport {
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    body.theme-emerald #phone-viewport {
+      background: radial-gradient(circle at 50% 42%, #1d7c59 0%, #0e523a 58%, #062b1e 100%);
+    }
+    body.theme-crimson #phone-viewport {
+      background: radial-gradient(circle at 50% 42%, #911c20 0%, #590b0e 60%, #2b0405 100%);
+    }
+    body.theme-wood #phone-viewport {
+      background: radial-gradient(circle at 50% 42%, #6e4726 0%, #422914 60%, #241509 100%);
+    }
+
+    /* Ambient Background Decor inside Phone */
+    #bg-decor {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .bamboo-corner-tl {
+      position: absolute;
+      top: -10px;
+      left: -12px;
+      width: 210px;
+      height: 210px;
+      opacity: 0.28;
+      color: #031a11;
+    }
+    .bamboo-corner-bl {
+      position: absolute;
+      bottom: 44px;
+      left: -16px;
+      width: 220px;
+      height: 220px;
+      opacity: 0.22;
+      color: #031a11;
+    }
+    .center-watermark-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .center-watermark-svg {
+      width: 220px;
+      height: 220px;
+      opacity: 0.08;
+      color: #000000;
+    }
+
+    /* Vita Logo Typography with Wooden Plaque Outline (Exact match to 6-FXD1I2ELQ 00:09) */
+    .vita-script {
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 900;
+      color: #fffdf5;
+      -webkit-text-stroke: 1.5px #4d2207;
+      text-shadow: 0 3px 0 #4d2207, 0 5px 10px rgba(0,0,0,0.65);
+      letter-spacing: 0.5px;
+    }
+    .mahjong-title-3d {
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #f6b94d;
+      background: linear-gradient(180deg, #fff7c7 0%, #f7b744 45%, #c96d12 85%, #874308 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 0 #4a2104) drop-shadow(0 -1px 0 #4a2104) drop-shadow(2px 0 0 #4a2104) drop-shadow(-2px 0 0 #4a2104) drop-shadow(0 5px 8px rgba(0,0,0,0.65));
+    }
+
+    /* =====================================================================
+       2. SPLASH / QUOTE LOADING SCREEN (6-FXD1I2ELQ 00:00 - 00:07)
+       ===================================================================== */
+    #splash-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 44px 24px 32px;
+      background: radial-gradient(circle at 50% 42%, #197355 0%, #0d4a36 60%, #05261a 100%);
+      transition: opacity 0.38s ease;
+    }
+    .splash-quote-box {
+      text-align: center;
+      margin: auto 0;
+      padding: 0 6px;
+    }
+    .splash-vita-brand {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .splash-quote-text {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.96);
+      text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+      margin-bottom: 12px;
+    }
+    .splash-quote-author {
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(209, 250, 229, 0.9);
+    }
+    .splash-bottom-box {
+      width: 100%;
+      max-width: 270px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .splash-bar-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 36px;
+    }
+    #splash-rolling-tile {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 38px;
+      border-radius: 6px;
+      background: #fbf8ee;
+      border: 1.5px solid #d6cbb5;
+      box-shadow: 0 3px 0 #1b7a46, 0 5px 8px rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 17px;
+      color: #137a3f;
+      transition: transform 0.08s linear;
+    }
+    .splash-bar-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(0,0,0,0.42);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 1.5px;
+      overflow: hidden;
+    }
+    #splash-progress-fill {
+      height: 100%;
+      width: 20%;
+      background: linear-gradient(90deg, #34d399, #86efac);
+      border-radius: 999px;
+      transition: width 0.08s linear;
+    }
+
+    /* =====================================================================
+       3. HOME / SHOJI SLIDING DOORS SCREEN (Exact Moon-Gate Arch & Ornate Lock)
+       ===================================================================== */
+    #home-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 45;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+    #home-screen.doors-open,
+    #home-screen.doors-open * {
+      pointer-events: none !important;
+    }
+    .shoji-doors-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+    }
+    .shoji-door {
+      position: relative;
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      transition: transform 0.78s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #e2c799;
+      background-image:
+        radial-gradient(circle at 50% 44%, rgba(255, 248, 220, 0.72), rgba(176, 128, 72, 0.88)),
+        repeating-linear-gradient(0deg, transparent 0px, transparent 54px, #6e3513 54px, #6e3513 59px),
+        repeating-linear-gradient(90deg, transparent 0px, transparent 46px, #6e3513 46px, #6e3513 51px);
+      box-shadow: inset 0 0 40px rgba(78, 36, 10, 0.65), 0 0 24px rgba(0,0,0,0.7);
+    }
+    .shoji-left {
+      justify-content: flex-end;
+      border-right: 4px solid #4a2006;
+    }
+    .shoji-right {
+      justify-content: flex-start;
+      border-left: 4px solid #4a2006;
+    }
+    #home-screen.doors-open .shoji-left {
+      transform: translateX(-105%);
+    }
+    #home-screen.doors-open .shoji-right {
+      transform: translateX(105%);
+    }
+    #home-screen.doors-open .home-center-ui {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    .home-center-ui {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Circular Moon-Gate Wooden Arch Spandrel Overlay (Exact match to 6-FXD1I2ELQ 00:09 & l5TW4kcRN-c 00:01) */
+    .moongate-arch-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle 225px at 50% 44%, transparent 94%, #7a3c14 95%, #542508 98%, #3d1904 100%);
+      z-index: 4;
+    }
+
+    /* Center Ornate Carved Chinese Medallion Lock */
+    .medallion-half-left, .medallion-half-right {
+      position: relative;
+      z-index: 6;
+      width: 82px;
+      height: 164px;
+      background: radial-gradient(circle at 100% 50%, #a85820 0%, #6e320c 65%, #4a1f05 100%);
+      border: 3.5px solid #d99646;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+    }
+    .medallion-half-right {
+      background: radial-gradient(circle at 0% 50%, #a85820 0%, #6e320c 65%, #4a1f05 100%);
+    }
+    .medallion-half-left {
+      border-right: none;
+      border-radius: 164px 0 0 164px;
+      justify-content: flex-end;
+      padding-right: 6px;
+    }
+    .medallion-half-right {
+      border-left: none;
+      border-radius: 0 164px 164px 0;
+      justify-content: flex-start;
+      padding-left: 6px;
+    }
+
+    /* Bamboo Blind at Top of Home Screen */
+    .bamboo-blind {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 50px;
+      background: repeating-linear-gradient(180deg, #8c5220 0px, #b57135 2.5px, #5e320d 5px);
+      border-bottom: 7px solid #6b3812;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 -3px 4px rgba(255,210,140,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 12px;
+      gap: 8px;
+    }
+    .tassel-wrap {
+      position: absolute;
+      top: 46px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .tassel-cord { width: 2px; height: 38px; background: #8c2d19; }
+    .tassel-bead { width: 9px; height: 9px; border-radius: 50%; background: #f59e0b; border: 1.5px solid #78350f; }
+    .tassel-fringe { width: 11px; height: 34px; background: linear-gradient(180deg, #dc2626, #991b1b); border-radius: 0 0 6px 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.45); }
+
+    .home-body-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 14px 20px;
+      pointer-events: none;
+    }
+    .home-logo-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: auto;
+    }
+    .home-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .home-logo-tile {
+      width: 38px;
+      height: 48px;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #fffef9, #e8e0c5);
+      border: 2px solid #1b7a46;
+      box-shadow: 0 4px 0 #145933, 0 6px 12px rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(10deg);
+      color: #137a3f;
+      font-weight: 900;
+      font-size: 24px;
+    }
+    .home-mid-widgets {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      margin: auto 0;
+    }
+    .widget-btn {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.15s ease;
+    }
+    .widget-btn:hover { transform: scale(1.05); }
+    .widget-btn:active { transform: scale(0.95); }
+    .widget-icon-daily {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #dc2626, #7f1d1d);
+      border: 2.5px solid #fcd34d;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+    .daily-check-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 1.5px solid #ffffff;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .widget-icon-trophy {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #059669, #064e3b);
+      border: 2.5px solid #fcd34d;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+    .widget-ribbon {
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #5e2c0e;
+      border: 1.5px solid #c98842;
+      color: #fef3c7;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+    }
+
+    .home-bottom-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .vita-level-btn {
+      width: 224px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #f7a84b 0%, #e06d19 50%, #b84806 100%);
+      border: 3px solid #ffd88a;
+      box-shadow: 0 5px 0 #6e2802, 0 10px 20px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.65);
+      color: #ffffff;
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 3px rgba(100, 35, 0, 0.85);
+      transition: transform 0.12s ease;
+    }
+    .vita-level-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #6e2802;
+    }
+    .vita-journey-btn {
+      width: 264px;
+      padding: 9px 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #9c5a25 0%, #633410 100%);
+      border: 2px solid #e0a358;
+      box-shadow: 0 4px 0 #3d1e05, 0 8px 16px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fef3c7;
+    }
+
+    /* =====================================================================
+       4. MOBILE GAMEPLAY SCREEN (Exact HUD of 6-FXD1I2ELQ & z9EgseVY5NQ)
+       ===================================================================== */
+    #game-screen {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 10px 0;
+      overflow: hidden;
+    }
+
+    .hud-header-wrap {
+      position: relative;
+      z-index: 25;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hud-top-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    .wood-circle-btn {
+      background: radial-gradient(circle at 35% 30%, #783f19 0%, #4d230a 65%, #331504 100%);
+      border: 2.5px solid #d49546;
+      box-shadow: 0 3px 0 #260f02, 0 5px 10px rgba(0,0,0,0.55), inset 0 2px 3px rgba(255,220,160,0.45);
+      color: #fde68a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      transition: transform 0.1s ease;
+    }
+    .wood-circle-btn:active {
+      transform: translateY(2px) scale(0.96);
+    }
+    .btn-icon-md { width: 38px; height: 38px; font-size: 17px; font-weight: 900; }
+    .btn-pill-sm { height: 30px; padding: 0 9px; font-size: 11px; font-weight: 800; gap: 4px; }
+
+    .hud-stats-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      text-align: center;
+    }
+    .hud-stat-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hud-stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #e6c88c;
+      letter-spacing: 0.3px;
+    }
+    .hud-stat-val {
+      font-size: 19px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.65);
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+    .score-combo-glow {
+      color: #ffe866 !important;
+      text-shadow: 0 0 12px rgba(255, 215, 0, 0.95), 0 0 22px rgba(255, 180, 0, 0.8);
+      transform: scale(1.12);
+    }
+
+    /* Smooth Dark-Brown Recessed Wooden Staging Box (z9EgseVY5NQ 00:50 & l5TW4kcRN-c 00:08) */
+    .hud-tray-row {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wooden-staging-tray {
+      position: relative;
+      width: 198px;
+      height: 56px;
+      background: linear-gradient(180deg, #431f0a 0%, #592b10 100%);
+      border: 3px solid #b5763a;
+      border-radius: 10px;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      box-shadow:
+        inset 0 4px 8px rgba(0,0,0,0.72),
+        0 3px 0 #291104,
+        0 6px 14px rgba(0,0,0,0.45);
+    }
+    #staging-slots {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      height: 100%;
+    }
+    .tray-empty-slot {
+      width: 42px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .tray-slot-tile {
+      width: 40px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: trayLand 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .tray-slot-tile svg { width: 100%; height: 100%; }
+    @keyframes trayLand {
+      from { transform: scale(1.18) translateY(6px); }
+      to { transform: scale(1) translateY(0); }
+    }
+
+    /* Floating Combo Text & +240 Score */
+    #combo-banner {
+      pointer-events: none;
+      position: absolute;
+      left: 6px;
+      top: 4px;
+      z-index: 35;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      opacity: 0;
+    }
+    .combo-title-perfect {
+      font-size: 22px;
+      font-weight: 900;
+      font-style: italic;
+      color: #fcd34d;
+      text-shadow: 0 3px 4px rgba(0,0,0,0.88);
+    }
+    .combo-title-good {
+      font-size: 22px;
+      font-weight: 900;
+      color: #6ee7b7;
+      text-shadow: 0 3px 4px rgba(0,0,0,0.88);
+    }
+    .combo-sub-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fef08a;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.9);
+    }
+    .combo-banner-anim {
+      animation: comboPop 0.9s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+    }
+    @keyframes comboPop {
+      0% { transform: scale(0.4) translateY(8px); opacity: 0; }
+      25% { transform: scale(1.1) translateY(0); opacity: 1; }
+      75% { transform: scale(1) translateY(0); opacity: 1; }
+      100% { transform: scale(0.95) translateY(-6px); opacity: 0; }
+    }
+
+    #tray-score-popup {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #tray-score-text {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fde68a;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+    }
+
+    /* =====================================================================
+       5. CENTER MAHJONG BOARD & SELF-CONTAINED 3D BLOCK TILES
+       ===================================================================== */
+    #board-viewport {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      margin: 2px 0;
+    }
+    #board-stage {
+      position: relative;
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.26s ease;
+    }
+
+    /* Each .mahjong-tile renders a full 3D SVG block (Top Face + Cream Chin + Green Base) */
+    .mahjong-tile {
+      position: absolute;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease;
+    }
+    .mahjong-tile > svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .mahjong-tile.tile-covered {
+      cursor: default;
+    }
+
+    .mahjong-tile.tile-locked-flash {
+      animation: lockedShake 0.35s ease;
+    }
+    @keyframes lockedShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .edge-padlock {
+      position: absolute;
+      top: 44%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+      z-index: 1500;
+      pointer-events: none;
+    }
+    .edge-padlock-left { left: -9px; }
+    .edge-padlock-right { right: -9px; }
+
+    .mahjong-tile.tile-selected {
+      transform: translateY(-6px) scale(1.04);
+      filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.85));
+      z-index: 999 !important;
+    }
+
+    .mahjong-tile.tile-hinted {
+      animation: hintPulse 0.85s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.85));
+      z-index: 950 !important;
+    }
+    @keyframes hintPulse {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-4px) scale(1.03); }
+    }
+    .hint-thumb-badge {
+      position: absolute;
+      bottom: 2px;
+      right: -6px;
+      font-size: 24px;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.65));
+      animation: thumbBounce 0.55s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 1400;
+    }
+    @keyframes thumbBounce {
+      from { transform: scale(0.95) rotate(-8deg); }
+      to { transform: scale(1.14) rotate(6deg); }
+    }
+
+    #locked-toast {
+      pointer-events: none;
+      position: absolute;
+      z-index: 1800;
+      padding: 8px 20px;
+      border-radius: 7px;
+      background: rgba(15, 20, 24, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.65);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .flying-tile-clone {
+      position: fixed;
+      z-index: 2000;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.55));
+    }
+    .flying-tile-clone svg { width: 100%; height: 100%; }
+
+    /* =====================================================================
+       6. BOTTOM CURVED WOODEN TABLE RIM & POWERUP BUTTONS (6-FXD1I2ELQ 00:13)
+       ===================================================================== */
+    .bottom-wooden-arch {
+      position: relative;
+      z-index: 25;
+      width: calc(100% + 20px);
+      margin-left: -10px;
+      height: 66px;
+      background: radial-gradient(ellipse at 50% 120%, #7d3e15 0%, #4f2409 68%, #361704 100%);
+      border-top: 3px solid #c88741;
+      border-radius: 50% 50% 0 0 / 22px 22px 0 0;
+      box-shadow: 0 -6px 18px rgba(0,0,0,0.55), inset 0 3px 6px rgba(255,215,150,0.28);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 18px 4px;
+    }
+    .powerup-btn {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      margin-top: -12px;
+    }
+    .powerup-btn svg {
+      width: 25px;
+      height: 25px;
+      color: #ffd584;
+    }
+    .badge-count {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: #dc2626;
+      border: 1.5px solid #fde68a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+    }
+    .badge-free {
+      position: absolute;
+      top: -4px;
+      right: -8px;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: #10b981;
+      border: 1.5px solid #ffffff;
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 900;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+    }
+
+    /* =====================================================================
+       7. MODALS (Options, Victory, Lab)
+       ===================================================================== */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 70;
+      background: rgba(0, 0, 0, 0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .vita-modal-card {
+      width: 100%;
+      max-width: 350px;
+      background: #f5ebd1;
+      border: 4px solid #783f17;
+      border-radius: 20px;
+      box-shadow: 0 18px 44px rgba(0,0,0,0.75), inset 0 0 0 2px #d9b47c;
+      color: #4a260b;
+      overflow: hidden;
+    }
+    .vita-modal-header {
+      position: relative;
+      background: linear-gradient(180deg, #7a3e14 0%, #522608 100%);
+      border-bottom: 3px solid #c98842;
+      color: #ffefc2;
+      padding: 12px 18px;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 900;
+      text-shadow: 0 2px 2px rgba(0,0,0,0.6);
+    }
+    .modal-close-btn {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e89d41;
+      border: 2px solid #fff1c2;
+      color: #592606;
+      font-size: 15px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vita-modal-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .parchment-box {
+      background: #ebdcc0;
+      border: 1.5px solid #c9b086;
+      border-radius: 12px;
+      padding: 9px 11px;
+    }
+    .audio-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+    .audio-card {
+      background: #ebdcc0;
+      border: 1.5px solid #c9b086;
+      border-radius: 12px;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .switch-pill {
+      width: 100%;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      color: #ffffff;
+      text-align: center;
+    }
+    .switch-on { background: #10b981; }
+    .switch-off { background: #78716c; }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #4a260b;
+      padding: 3px 0;
+    }
+    .theme-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .theme-pick-btn {
+      padding: 6px 4px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 800;
+      border: 2px solid transparent;
+    }
+    .theme-pick-btn.active-theme {
+      border-color: #f59e0b;
+    }
+
+    #modal-status-toast {
+      pointer-events: none;
+      position: absolute;
+      top: 32%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 7px 16px;
+      border-radius: 9px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 95;
+    }
+
+    .lab-card {
+      width: 100%;
+      max-width: 370px;
+      max-height: 82vh;
+      background: #0d261d;
+      border: 2px solid #d99b43;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      color: #ecfdf5;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+    }
+    .lab-header {
+      background: #143d2f;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(217, 155, 67, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .lab-body {
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .lab-section {
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .lab-btn-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .lab-sfx-btn {
+      padding: 5px 9px;
+      border-radius: 7px;
+      background: #065f46;
+      border: 1px solid rgba(110, 231, 183, 0.4);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 80;
+    }
+  </style>
+</head>
+<body class="theme-emerald">
+
+  <!-- SHARED SVG DEFS FOR 3D MAHJONG TILE GRADIENTS -->
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <!-- Top Ivory Face Gradient -->
+      <linearGradient id="gradIvoryFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fffef9" />
+        <stop offset="75%" stop-color="#f7f2e2" />
+        <stop offset="100%" stop-color="#eae2cd" />
+      </linearGradient>
+      <!-- Covered Slate-Gray Face Gradient (l5TW4kcRN-c 00:15, 00:32) -->
+      <linearGradient id="gradSlateFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#a2a9af" />
+        <stop offset="75%" stop-color="#878e94" />
+        <stop offset="100%" stop-color="#72797f" />
+      </linearGradient>
+      <!-- Hinted Cyan Face Gradient (l5TW4kcRN-c 00:37) -->
+      <linearGradient id="gradCyanFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e3fafe" />
+        <stop offset="75%" stop-color="#84e6f2" />
+        <stop offset="100%" stop-color="#4dd0e1" />
+      </linearGradient>
+      <!-- Cream-Bone 3D Chin Gradient -->
+      <linearGradient id="gradBoneChin" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#e8e0cb" />
+        <stop offset="100%" stop-color="#cfc5ad" />
+      </linearGradient>
+      <!-- Emerald-Green 3D Base Gradient -->
+      <linearGradient id="gradGreenBase" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1e874c" />
+        <stop offset="55%" stop-color="#146b3a" />
+        <stop offset="100%" stop-color="#0b4725" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+
+
+  <!-- ===================================================================== -->
+  <!-- STRICT MOBILE PHONE VIEWPORT (400x856 Portrait Mobile Screen)         -->
+  <!-- ===================================================================== -->
+  <div id="phone-viewport">
+
+    <!-- AMBIENT BACKGROUND WATERMARK & BAMBOO SILHOUETTES -->
+    <div id="bg-decor">
+      <svg class="bamboo-corner-tl" viewBox="0 0 200 200" fill="currentColor">
+        <path d="M0,0 L40,90 C25,65 10,45 0,0 Z" />
+        <path d="M15,0 C55,45 95,85 130,135 C80,105 45,65 15,0 Z" />
+        <path d="M35,10 C90,35 140,60 185,95 C130,75 80,50 35,10 Z" />
+        <path d="M5,40 C45,85 75,130 95,185 C60,140 30,95 5,40 Z" />
+      </svg>
+      <svg class="bamboo-corner-bl" viewBox="0 0 200 200" fill="currentColor">
+        <path d="M0,200 C30,145 75,95 125,55 C85,110 45,160 0,200 Z" />
+        <path d="M0,165 C45,130 95,100 150,80 C100,115 50,145 0,165 Z" />
+        <path d="M25,200 C65,155 110,125 165,105 C120,145 70,175 25,200 Z" />
+      </svg>
+      <div class="center-watermark-wrap">
+        <svg class="center-watermark-svg" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="4">
+          <circle cx="100" cy="100" r="86" stroke-dasharray="12 6" />
+          <circle cx="100" cy="100" r="72" stroke-width="3" />
+          <circle cx="100" cy="100" r="38" stroke-width="3" />
+          <path d="M100,14 C120,40 120,60 100,62 C80,60 80,40 100,14 Z" />
+          <path d="M100,186 C120,160 120,140 100,138 C80,140 80,160 100,186 Z" />
+          <path d="M14,100 C40,120 60,120 62,100 C60,80 40,80 14,100 Z" />
+          <path d="M186,100 C160,120 140,120 138,100 C140,80 160,80 186,100 Z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- 1. SPLASH / QUOTE LOADING SCREEN (6-FXD1I2ELQ 00:00 - 00:07) -->
+    <div id="splash-screen">
+      <div style="height:12px;"></div>
+      <div class="splash-quote-box">
+        <div class="vita-script splash-vita-brand">Vita</div>
+        <p id="splash-quote" class="splash-quote-text">
+          “Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.”
+        </p>
+        <p id="splash-author" class="splash-quote-author">- Martin Luther King, Jr.</p>
+      </div>
+
+      <div class="splash-bottom-box">
+        <div class="splash-bar-wrap">
+          <div id="splash-rolling-tile">發</div>
+          <div class="splash-bar-track">
+            <div id="splash-progress-fill"></div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="vita-script" style="font-size:22px;">Vita</div>
+          <div class="mahjong-title-3d" style="font-size:18px;">MAHJONG</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HOME / SHOJI SLIDING DOOR SCREEN (6-FXD1I2ELQ 00:08 - 00:12) -->
+    <div id="home-screen">
+      <div class="shoji-doors-wrap">
+        <!-- Left Shoji Door with Painted Ink Bamboo Silhouette & Ornate Medallion Half -->
+        <div class="shoji-door shoji-left">
+          <svg style="position:absolute;left:8px;bottom:90px;width:150px;height:280px;opacity:0.22;color:#3d220a;pointer-events:none;" viewBox="0 0 100 180" fill="currentColor">
+            <rect x="22" y="0" width="3.5" height="180" />
+            <rect x="58" y="25" width="3" height="155" />
+            <path d="M25,45 C48,32 68,22 86,12 C64,32 45,45 25,45 Z" />
+            <path d="M22,82 C5,68 -8,56 -18,45 C0,68 12,80 22,82 Z" />
+            <path d="M60,75 C80,62 94,50 108,38 C90,62 74,74 60,75 Z" />
+          </svg>
+          <div class="medallion-half-left">
+            <svg viewBox="0 0 80 160" style="width:74px;height:148px;">
+              <!-- Ornate Chinese Scrollwork Ring Left Half -->
+              <path d="M78,12 A68,68 0 0,0 78,148" fill="none" stroke="#f5be6e" stroke-width="2.5" stroke-dasharray="6 3" />
+              <path d="M78,24 A56,56 0 0,0 78,136" fill="none" stroke="#e09b45" stroke-width="6" stroke-dasharray="10 5" />
+              <path d="M78,42 A38,38 0 0,0 78,118" fill="#421c04" stroke="#f5be6e" stroke-width="2" />
+              <rect x="62" y="62" width="8" height="36" rx="4" fill="#260e01" stroke="#f5be6e" stroke-width="1.5" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Right Shoji Door with Painted Ink Bamboo Silhouette & Ornate Medallion Half -->
+        <div class="shoji-door shoji-right">
+          <svg style="position:absolute;right:8px;top:90px;width:150px;height:280px;opacity:0.22;color:#3d220a;pointer-events:none;" viewBox="0 0 100 180" fill="currentColor">
+            <rect x="68" y="0" width="3.5" height="180" />
+            <path d="M68,52 C42,38 22,26 6,14 C28,38 48,50 68,52 Z" />
+            <path d="M71,95 C88,82 100,70 112,58 C94,82 82,94 71,95 Z" />
+          </svg>
+          <div class="medallion-half-right">
+            <svg viewBox="0 0 80 160" style="width:74px;height:148px;">
+              <path d="M2,12 A68,68 0 0,1 2,148" fill="none" stroke="#f5be6e" stroke-width="2.5" stroke-dasharray="6 3" />
+              <path d="M2,24 A56,56 0 0,1 2,136" fill="none" stroke="#e09b45" stroke-width="6" stroke-dasharray="10 5" />
+              <path d="M2,42 A38,38 0 0,1 2,118" fill="#421c04" stroke="#f5be6e" stroke-width="2" />
+              <rect x="10" y="62" width="8" height="36" rx="4" fill="#260e01" stroke="#f5be6e" stroke-width="1.5" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Circular Moon-Gate Wooden Arch Frame -->
+      <div class="home-center-ui moongate-arch-overlay"></div>
+
+      <div class="home-center-ui">
+        <div class="bamboo-blind">
+          <div class="tassel-wrap" style="left: 20px;">
+            <div class="tassel-cord"></div>
+            <div class="tassel-bead"></div>
+            <div class="tassel-fringe"></div>
+          </div>
+          <div class="tassel-wrap" style="right: 20px;">
+            <div class="tassel-cord"></div>
+            <div class="tassel-bead"></div>
+            <div class="tassel-fringe"></div>
+          </div>
+
+          <button id="btn-home-lab" class="wood-circle-btn btn-pill-sm" title="复刻工作流">🔬 复刻工作流</button>
+          <button id="btn-home-theme" class="wood-circle-btn btn-icon-md" title="切换主题背景">🎨</button>
+          <button id="btn-home-settings" class="wood-circle-btn btn-icon-md" title="设置 (Settings)">⚙️</button>
+        </div>
+      </div>
+
+      <div class="home-center-ui home-body-wrap">
+        <div class="home-logo-block">
+          <div class="home-logo-row">
+            <span class="vita-script" style="font-size:46px;">Vita</span>
+            <div class="home-logo-tile">發</div>
+          </div>
+          <div class="mahjong-title-3d" style="font-size:36px; margin-top:-6px;">MAHJONG</div>
+        </div>
+
+        <div class="home-mid-widgets">
+          <button id="btn-daily-mode" class="widget-btn">
+            <div class="widget-icon-daily">
+              <span style="font-size:9px; font-weight:800; color:#fde68a;">OCT</span>
+              <span style="font-size:20px; font-weight:900; line-height:1;">21</span>
+              <span class="daily-check-badge">✓</span>
+            </div>
+            <span class="widget-ribbon">Daily</span>
+          </button>
+
+          <div id="door-halo" style="width:110px; height:110px; border-radius:50%; opacity:0; transition:all 0.45s ease; background:radial-gradient(circle, rgba(255,230,120,0.85) 0%, rgba(255,140,40,0.35) 55%, transparent 75%);"></div>
+
+          <button id="btn-challenge-mode" class="widget-btn">
+            <div class="widget-icon-trophy">🏆</div>
+            <span id="home-countdown" class="widget-ribbon">21:59:42</span>
+          </button>
+        </div>
+
+        <div class="home-bottom-actions">
+          <button id="btn-start-level" class="vita-level-btn">
+            <span id="home-level-label">Level 1</span>
+          </button>
+
+          <button id="btn-journey-mode" class="vita-journey-btn">
+            <span style="font-size:18px;">🎻</span>
+            <div style="text-align:center;">
+              <div style="font-size:16px; font-weight:900; color:#ffffff;">Journey</div>
+              <div style="font-size:10.5px; color:#fde68a;">🕒 1d 9h 12m · 隐藏牌挑战</div>
+            </div>
+            <span style="font-size:18px;">🪉</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PURE MOBILE GAMEPLAY SCREEN (z9EgseVY5NQ & 6-FXD1I2ELQ & l5TW4kcRN-c) -->
+    <div id="game-screen">
+
+      <!-- TOP HUD & WOODEN TRAY -->
+      <div class="hud-header-wrap">
+        <div class="hud-top-row">
+          <button id="btn-back-home" class="wood-circle-btn btn-icon-md" title="返回主页">←</button>
+
+          <div class="hud-stats-group">
+            <div class="hud-stat-col">
+              <span class="hud-stat-label">Level</span>
+              <span id="hud-level" class="hud-stat-val">1</span>
+            </div>
+            <div class="hud-stat-col">
+              <span class="hud-stat-label">Score</span>
+              <span id="hud-score" class="hud-stat-val">600</span>
+            </div>
+            <div class="hud-stat-col">
+              <span class="hud-stat-label">Matches</span>
+              <span id="hud-matches" class="hud-stat-val">10</span>
+            </div>
+          </div>
+
+          <button id="btn-open-options" class="wood-circle-btn btn-icon-md" title="选项 (Options)">☰</button>
+        </div>
+
+        <!-- Smooth Dark-Brown Recessed Wooden Box (z9EgseVY5NQ 00:50 & l5TW4kcRN-c 00:08) -->
+        <div class="hud-tray-row">
+          <div id="combo-banner">
+            <span id="combo-title" class="combo-title-perfect">Perfect</span>
+            <span id="combo-sub" class="combo-sub-text">Combo x5</span>
+          </div>
+
+          <div id="staging-tray-container" class="wooden-staging-tray">
+            <div id="staging-slots">
+              <div class="tray-empty-slot"></div>
+              <div class="tray-empty-slot"></div>
+              <div class="tray-empty-slot"></div>
+              <div class="tray-empty-slot"></div>
+            </div>
+            <div id="tray-score-popup">
+              <span id="tray-score-text">+240</span>
+            </div>
+          </div>
+        </div>
+        <span id="guide-status-text" style="display:none;"></span>
+      </div>
+
+      <!-- CENTER MAHJONG 3D BOARD -->
+      <div id="board-viewport">
+        <div id="board-stage"></div>
+        <div id="locked-toast">Locked by left and right</div>
+      </div>
+
+      <!-- BOTTOM CURVED WOODEN TABLE RIM & 3 BUTTONS (z9EgseVY5NQ 00:50 & 6-FXD1I2ELQ 00:13) -->
+      <div class="bottom-wooden-arch">
+        <button id="btn-shuffle" class="wood-circle-btn powerup-btn" title="洗牌 (Shuffle)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <span id="badge-shuffle" class="badge-count">3</span>
+        </button>
+
+        <button id="btn-hint" class="wood-circle-btn powerup-btn" title="提示 (Hint)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6"></path>
+            <path d="M10 22h4"></path>
+            <path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.1 1 1.8V17h6v-.5c0-.7.4-1.4 1-1.8A7 7 0 0 0 12 2z"></path>
+          </svg>
+          <span id="badge-hint" class="badge-count">3</span>
+        </button>
+
+        <button id="btn-undo" class="wood-circle-btn powerup-btn" title="撤销 (Undo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 14 4 9l5-5"></path>
+            <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"></path>
+          </svg>
+          <span class="badge-free">Free</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. OPTIONS / SETTINGS MODAL (omfcit-YtVQ 00:09 & 00:51) -->
+    <div id="options-modal" class="modal-backdrop hidden">
+      <div class="vita-modal-card">
+        <div class="vita-modal-header">
+          <span>Options</span>
+          <button id="btn-close-options" class="modal-close-btn">✕</button>
+        </div>
+
+        <div class="vita-modal-body">
+          <div class="parchment-box" style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:38px; height:38px; border-radius:9px; background:#0369a1; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:20px;">🐼</div>
+              <div>
+                <div style="font-size:10.5px; color:#7a5230; font-weight:700;">Player ID</div>
+                <div style="font-size:13.5px; color:#3d1e05; font-weight:900;">Sav111233</div>
+              </div>
+            </div>
+            <span style="padding:3px 7px; border-radius:6px; background:#059669; color:#fff; font-size:10.5px; font-weight:800;">✓</span>
+          </div>
+
+          <div class="audio-grid-3">
+            <div class="audio-card">
+              <span id="icon-music-state" style="font-size:20px;">🎵</span>
+              <button id="toggle-music" class="switch-pill switch-on">ON</button>
+            </div>
+            <div class="audio-card">
+              <span id="icon-sound-state" style="font-size:20px;">🔊</span>
+              <button id="toggle-sound" class="switch-pill switch-on">ON</button>
+            </div>
+            <div class="audio-card">
+              <span id="icon-birds-state" style="font-size:20px;">📳</span>
+              <button id="toggle-birds" class="switch-pill switch-on">ON</button>
+            </div>
+          </div>
+
+          <div class="parchment-box">
+            <div class="option-row">
+              <span>🃏 Auto Match (牌槽自动配对)</span>
+              <button id="toggle-tray-mode" class="switch-pill switch-on" style="width:60px;">ON</button>
+            </div>
+            <div class="option-row" style="border-top:1px solid #d6c09a; margin-top:5px; padding-top:7px;">
+              <span>☑️ Auto Complete (残局自动收牌)</span>
+              <button id="toggle-autocomplete" class="switch-pill switch-on" style="width:60px;">ON</button>
+            </div>
+          </div>
+
+          <div class="parchment-box">
+            <div style="font-size:11px; font-weight:900; color:#694322;">🎨 Theme</div>
+            <div class="theme-grid-3">
+              <button data-theme="emerald" class="theme-pick-btn active-theme" style="background:#0f5940;">翠竹绿</button>
+              <button data-theme="crimson" class="theme-pick-btn" style="background:#781418;">宫廷红</button>
+              <button data-theme="wood" class="theme-pick-btn" style="background:#5c3a1d;">禅意木</button>
+            </div>
+          </div>
+
+          <div class="parchment-box option-row">
+            <span>🔄 Restart</span>
+            <button id="btn-modal-restart" style="padding:5px 14px; border-radius:7px; background:#059669; color:#fff; font-weight:900; font-size:12px;">Restart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-status-toast">Music is on</div>
+
+    <!-- 5. VICTORY / LEVEL COMPLETE MODAL (6-FXD1I2ELQ 00:17) -->
+    <div id="victory-modal" class="modal-backdrop hidden">
+      <div class="vita-modal-card" style="text-align:center;">
+        <div class="vita-modal-header">
+          <div style="font-size:10px; color:#fcd34d; letter-spacing:1px; text-transform:uppercase;">Vivi Challenge</div>
+          <div style="font-size:20px; margin-top:2px;">🎉 Level Completed!</div>
+        </div>
+        <div class="vita-modal-body">
+          <div class="parchment-box">
+            <div style="font-size:11.5px; font-weight:800; color:#694322; margin-bottom:6px;">Winning Streak</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span style="padding:3px 10px; border-radius:99px; background:#059669; color:#fff; font-weight:900; font-size:11px;">x1</span>
+              <div style="height:5px; width:36px; background:#10b981; border-radius:99px;"></div>
+              <span style="padding:3px 10px; border-radius:99px; background:#f59e0b; color:#fff; font-weight:900; font-size:11px;">x1.5</span>
+              <div style="height:5px; width:36px; background:#d6d3d1; border-radius:99px;"></div>
+              <span style="padding:3px 10px; border-radius:99px; background:#a8a29e; color:#fff; font-weight:900; font-size:11px;">x2</span>
+            </div>
+          </div>
+
+          <div class="audio-grid-3">
+            <div class="parchment-box">
+              <div style="font-size:10px; color:#7a5230; font-weight:700;">Score</div>
+              <div id="win-score" style="font-size:16px; font-weight:900; color:#3d1e05; margin-top:2px;">14,240</div>
+            </div>
+            <div class="parchment-box">
+              <div style="font-size:10px; color:#7a5230; font-weight:700;">Combo</div>
+              <div id="win-combo" style="font-size:16px; font-weight:900; color:#047857; margin-top:2px;">Combo x8</div>
+            </div>
+            <div class="parchment-box">
+              <div style="font-size:10px; color:#7a5230; font-weight:700;">Time</div>
+              <div id="win-time" style="font-size:16px; font-weight:900; color:#3d1e05; margin-top:2px;">01:12</div>
+            </div>
+          </div>
+
+          <button id="btn-next-stage" class="vita-level-btn" style="width:100%; font-size:19px; padding:11px;">
+            Continue · 下一关
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. FRAME-BY-FRAME REPLICATION LAB MODAL -->
+    <div id="lab-modal" class="modal-backdrop hidden">
+      <div class="lab-card">
+        <div class="lab-header">
+          <div>
+            <div style="font-size:14px; font-weight:900; color:#fde68a;">🔬 Vita Mahjong 帧级复刻实验室</div>
+            <div style="font-size:10.5px; color:#a7f3d0;">原视频牌面矢量雕刻与 Web Audio 合成器</div>
+          </div>
+          <button id="btn-close-lab" class="modal-close-btn" style="position:static; width:28px; height:28px;">✕</button>
+        </div>
+
+        <div class="lab-body">
+  <!-- SUBTLE HELPER DOCK OUTSIDE PHONE FRAME -->
+  <div id="play-guide-bar" class="outer-floating-bar">
+    <button id="btn-demo-move" class="wood-circle-btn btn-pill-sm" style="background:#065f46;border-color:#6ee7b7;" title="自动演示消除一对牌">▶ 演示一步</button>
+    <button id="btn-toggle-mode" class="wood-circle-btn btn-pill-sm" title="切换模式">
+      <span id="mode-badge-text">牌槽模式</span> <span>⇄</span>
+    </button>
+    <button id="btn-game-lab" class="wood-circle-btn btn-pill-sm" title="打开复刻面板">🔬 复刻面板</button>
+    <button id="btn-quick-audio" class="wood-circle-btn btn-pill-sm" title="切换静音">🔊</button>
+    <div style="display:flex;gap:4px;">
+      <button id="btn-prev-level" class="wood-circle-btn btn-pill-sm" title="上一关">◀</button>
+      <span id="bottom-level-name" style="display:none;">Level 1</span>
+      <button id="btn-next-level" class="wood-circle-btn btn-pill-sm" title="下一关">▶</button>
+    </div>
+  </div>
+          <div class="lab-section">
+            <div style="font-weight:800; color:#fcd34d;">🎧 音效与粒子测试台</div>
+            <div class="lab-btn-wrap">
+              <button data-test-sfx="select" class="lab-sfx-btn">🀄 选牌骨牌声 (Tile Click)</button>
+              <button data-test-sfx="match-bamboo" class="lab-sfx-btn">🎋 竹叶消除 +240 (Bamboo Burst)</button>
+              <button data-test-sfx="match-sakura" class="lab-sfx-btn">🌸 樱花连击 +360 (Sakura Burst)</button>
+              <button data-test-sfx="locked" class="lab-sfx-btn">🔒 左右锁死提示 (Locked Toast)</button>
+              <button data-test-sfx="door" class="lab-sfx-btn">🚪 推拉木门转场 (Shoji Slide)</button>
+              <button data-test-sfx="bird" class="lab-sfx-btn">🐦 林间清脆鸟鸣 (Ambient Bird)</button>
+              <button data-test-sfx="win" class="lab-sfx-btn">🏆 过关礼花音效 (Victory Fanfare)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#phone-viewport -->
+
+  <!-- PARTICLE EFFECTS CANVAS OVERLAY -->
+  <canvas id="fx-canvas"></canvas>
+
+  <script>
+    /*************************************************************************
+     * 1. WEB AUDIO API SYNTHESIZER
+     *************************************************************************/
+    class VitaAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.musicOn = true;
+        this.soundOn = true;
+        this.birdsOn = true;
+        this.bgmTimer = null;
+        this.birdTimer = null;
+        this.noteIdx = 0;
+        this.pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00];
+        this.melodyPattern = [0, 2, 3, 5, 4, 3, 2, 1, 0, 3, 4, 7, 6, 5, 3, 2];
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.startLoops();
+      }
+
+      startLoops() {
+        if (!this.bgmTimer) {
+          this.bgmTimer = setInterval(() => {
+            if (this.musicOn && this.ctx && this.ctx.state === 'running') {
+              this.playGuzhengNote();
+            }
+          }, 1350);
+        }
+        if (!this.birdTimer) {
+          this.birdTimer = setInterval(() => {
+            if (this.birdsOn && this.soundOn && this.ctx && this.ctx.state === 'running') {
+              if (Math.random() < 0.65) this.playBirdChirp();
+            }
+          }, 4200);
+        }
+      }
+
+      playGuzhengNote() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const idx = this.melodyPattern[this.noteIdx % this.melodyPattern.length];
+        this.noteIdx++;
+        const freq = this.pentatonic[idx];
+        const osc = this.ctx.createOscillator();
+        const harmonic = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        harmonic.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        harmonic.frequency.setValueAtTime(freq * 2, now);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.045, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0008, now + 2.2);
+        osc.connect(gain);
+        harmonic.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        harmonic.start(now);
+        osc.stop(now + 2.25);
+        harmonic.stop(now + 2.25);
+      }
+
+      playBirdChirp() {
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        const chirps = 1 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < chirps; i++) {
+          const t = now + i * 0.16;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          const baseFreq = 2200 + Math.random() * 600;
+          osc.frequency.setValueAtTime(baseFreq, t);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, t + 0.06);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.92, t + 0.12);
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.linearRampToValueAtTime(0.022, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0005, t + 0.13);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.14);
+        }
+      }
+
+      playTileClick() {
+        this.init();
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(920, now);
+        osc.frequency.exponentialRampToValueAtTime(280, now + 0.045);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.055);
+      }
+
+      playMatchSound(combo = 1) {
+        this.init();
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        [0, 0.055].forEach((offset, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(i === 0 ? 1050 : 1280, now + offset);
+          osc.frequency.exponentialRampToValueAtTime(340, now + offset + 0.05);
+          gain.gain.setValueAtTime(0.16, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.055);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.06);
+        });
+        const baseIdx = Math.min(combo, 5);
+        [0, 2, 4].forEach((step, idx) => {
+          const t = now + 0.08 + idx * 0.065;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          const freq = this.pentatonic[(baseIdx + step) % this.pentatonic.length];
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.09, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.45);
+        });
+      }
+
+      speakCombo(word) {
+        if (!this.soundOn) return;
+        try {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(word);
+            utter.lang = 'en-US';
+            utter.rate = 1.05;
+            utter.pitch = 1.05;
+            utter.volume = 0.45;
+            window.speechSynthesis.speak(utter);
+          }
+        } catch (e) {}
+      }
+
+      playLockedSound() {
+        this.init();
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        [0, 0.08].forEach((offset) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(190, now + offset);
+          osc.frequency.exponentialRampToValueAtTime(85, now + offset + 0.07);
+          gain.gain.setValueAtTime(0.18, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.075);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.08);
+        });
+      }
+
+      playDoorSlide() {
+        this.init();
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          const t = now + i * 0.08;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.07, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.6);
+        });
+      }
+
+      playVictoryFanfare() {
+        this.init();
+        if (!this.ctx || !this.soundOn) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+        notes.forEach((freq, i) => {
+          const t = now + i * 0.12;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.14, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.6);
+        });
+      }
+    }
+
+    const audio = new VitaAudioEngine();
+
+    /*************************************************************************
+     * 2. EXACT VECTOR GLYPH OUTLINES (Extracted from NotoSerifCJK-Bold.ttc)
+     *    & FULL 3D MAHJONG TILE RENDERER (viewBox="0 0 88 118")
+     *************************************************************************/
+    const VECTOR_GLYPHS = {"一": {"d": "M825 538 742 422H35L45 390H941C958 390 970 395 973 406C918 458 825 538 825 538Z", "cx": 504.0, "cy": 464.0, "w": 938, "h": 148}, "二": {"d": "M41 93 50 64H936C950 64 962 69 965 80C913 126 828 194 828 194L752 93ZM139 656 147 628H834C849 628 860 633 863 644C814 688 730 754 730 754L656 656Z", "cx": 503.0, "cy": 409.0, "w": 924, "h": 690}, "三": {"d": "M793 818 722 728H86L95 699H895C910 699 921 704 924 715C875 757 793 818 793 818ZM717 486 646 399H154L162 370H814C829 370 840 375 843 386C795 427 717 486 717 486ZM845 130 771 37H33L41 8H949C964 8 975 13 978 24C928 67 845 130 845 130Z", "cx": 505.5, "cy": 413.0, "w": 945, "h": 810}, "四": {"d": "M792 683V71H204V202L209 196C420 305 439 469 443 683H527V344C527 279 537 257 610 257H658C754 257 787 277 787 318C787 338 782 351 757 363L754 462H742C731 421 718 377 711 366C707 359 701 358 694 357C689 357 680 357 669 357H645C631 357 629 361 629 373V683ZM90 712V-53H109C158 -53 204 -25 204 -11V43H792V-45H810C852 -45 906 -19 907 -10V665C928 669 942 677 949 685L837 774L782 712H214L90 762ZM204 217V683H333C331 493 330 340 204 217Z", "cx": 519.5, "cy": 360.5, "w": 859, "h": 827}, "伍": {"d": "M330 440 339 411H477C456 259 431 101 409 -12H286L294 -40H965C979 -40 989 -35 991 -24C959 15 897 75 897 75L841 -12V393C861 398 875 406 882 414L770 500L712 440H603C616 535 628 627 638 704H911C926 704 936 709 939 720C895 760 822 817 822 817L757 733H335L343 704H516C507 628 495 536 481 440ZM529 -12C551 100 576 258 599 411H722V-12ZM221 850C179 652 97 441 20 309L32 301C74 337 113 378 149 423V-89H171C217 -89 265 -63 267 -55V555C286 558 294 565 297 574L257 589C290 648 319 712 345 780C368 780 381 788 385 800Z", "cx": 505.5, "cy": 380.5, "w": 971, "h": 939}, "六": {"d": "M309 451C255 252 141 75 25 -31L34 -41C200 40 332 166 424 370C448 367 461 374 466 386ZM600 433 590 426C696 315 800 147 828 4C974 -113 1072 226 600 433ZM46 597 54 569H933C948 569 959 574 961 585C913 626 835 686 835 686L764 597H558V789C585 793 593 803 595 817L437 830V597Z", "cx": 493.0, "cy": 394.5, "w": 936, "h": 871}, "七": {"d": "M31 405 44 379 325 432V82C325 -21 374 -43 500 -43H634C858 -43 913 -22 913 38C913 61 902 75 863 91L858 262H848C823 179 802 120 788 97C779 84 768 80 751 79C729 76 692 76 644 76H513C464 76 447 85 447 117V455L946 548C959 551 970 559 971 570C912 605 821 655 821 655L762 542L447 483V788C472 791 481 803 482 816L325 833V460Z", "cx": 501.0, "cy": 395.0, "w": 940, "h": 876}, "八": {"d": "M294 592C274 317 192 77 27 -58L38 -67C264 47 377 263 427 536C451 537 462 548 465 561ZM274 750 283 722H578C607 364 675 106 859 -58C878 -9 923 40 977 56L983 69C760 189 651 430 606 702C654 705 688 715 703 733L591 815L547 750Z", "cx": 505.0, "cy": 374.0, "w": 956, "h": 882}, "九": {"d": "M73 592 82 564H322C313 309 265 99 28 -74L39 -88C371 65 432 288 446 564H617V56C617 -22 637 -45 728 -45H803C936 -45 979 -23 979 24C979 46 973 58 943 72L940 232H929C912 166 894 100 883 80C877 69 872 66 863 65C854 64 835 64 815 64H761C737 64 732 70 732 86V552C754 555 764 561 771 569L663 658L605 592H447C450 659 450 729 451 802C475 805 486 815 488 830L324 845C324 756 325 672 323 592Z", "cx": 503.5, "cy": 378.5, "w": 951, "h": 933}, "萬": {"d": "M32 743 39 714H298V633H316C367 633 410 647 410 657V714H582V637H600C654 638 696 652 696 661V714H940C955 714 965 719 968 730C930 766 865 817 865 817L806 743H696V810C722 814 730 823 731 837L582 850V743H410V810C436 814 444 823 445 837L298 850V743ZM697 470V385H556V470ZM697 498H556V582H697ZM308 470H446V385H308ZM308 498V582H446V498ZM605 216 595 210C613 193 630 170 644 145L556 143V236H778V42C778 29 773 23 757 23C733 23 634 29 634 29V16C684 8 705 -4 720 -18C736 -34 740 -57 743 -89C873 -78 892 -38 892 31V217C912 220 927 230 933 238L818 323L768 264H556V356H697V317H717C755 317 810 343 811 352V565C829 569 842 577 848 584L739 666L687 610H315L196 657V303H212C258 303 308 328 308 338V356H446V264H240L118 312V-89H135C181 -89 230 -64 230 -53V236H446V140C365 138 299 138 259 139L302 14C313 15 324 23 331 35C471 67 578 93 659 115C666 97 671 79 672 62C760 -5 843 173 605 216Z", "cx": 500.0, "cy": 380.5, "w": 936, "h": 939}, "東": {"d": "M436 306H292V418H436ZM557 306V418H703V306ZM172 587V215H190C239 215 292 241 292 253V277H380C308 156 181 29 30 -50L37 -63C197 -12 334 62 436 156V-89H461C507 -89 557 -64 557 -53V268C623 116 730 8 876 -57C890 1 926 39 971 51L973 62C827 93 665 170 576 277H703V230H724C766 230 825 256 826 264V539C846 543 859 551 866 559L749 648L693 587H557V681H920C935 681 946 686 949 697C901 740 822 801 822 801L752 710H557V805C584 809 591 820 594 834L436 849V710H53L61 681H436V587H300L172 636ZM436 447H292V558H436ZM557 447V558H703V447Z", "cx": 501.5, "cy": 380.0, "w": 943, "h": 938}, "南": {"d": "M325 498 316 493C340 458 364 402 364 354C450 280 553 448 325 498ZM596 838 441 851V704H40L49 676H441V544H250L121 596V-90H140C190 -90 241 -62 241 -48V515H773V56C773 43 768 35 751 35C725 35 620 43 620 43V28C673 21 695 6 712 -11C728 -28 734 -55 736 -92C874 -80 893 -34 893 44V496C914 500 927 509 934 516L818 605L763 544H560V676H934C949 676 961 681 964 692C915 733 836 791 836 791L767 704H560V810C587 814 594 824 596 838ZM656 388 607 330H550C591 367 633 414 661 448C683 447 695 455 699 466L566 504C556 453 538 382 522 330H284L292 302H441V181H262L270 153H441V-59H461C520 -59 554 -39 555 -34V153H727C741 153 751 158 754 169C716 202 654 248 654 248L601 181H555V302H720C734 302 744 307 746 318C711 348 656 388 656 388Z", "cx": 502.0, "cy": 379.5, "w": 924, "h": 943}, "西": {"d": "M95 561V-84H116C174 -84 210 -62 210 -54V20H789V-80H810C870 -80 909 -55 909 -49V521C932 526 944 533 951 543L842 628L785 561H636V723H937C952 723 964 728 966 739C918 780 839 838 839 838L769 752H39L47 723H332V561H222L95 608ZM443 723H527V561H443ZM210 48V158L216 151C416 247 441 402 443 532H527V314C527 246 536 222 612 222H658C752 222 787 243 787 285C787 306 781 320 756 332L753 434H742C730 392 717 347 709 336C704 329 698 327 692 327C686 327 679 327 670 327H650C638 327 636 331 636 344V532H789V48ZM210 164V532H332C331 406 316 270 210 164Z", "cx": 502.5, "cy": 377.0, "w": 927, "h": 922}, "北": {"d": "M27 174 94 28C106 32 116 43 120 57C202 116 267 167 316 208V-86H339C383 -86 432 -62 432 -51V775C459 779 466 789 468 803L316 819V551H61L70 523H316V253C194 216 77 184 27 174ZM832 665C796 602 735 510 667 432V773C692 777 701 788 702 801L550 818V58C550 -30 580 -53 680 -53H771C929 -53 976 -32 976 19C976 41 967 54 935 69L930 216H920C902 154 885 94 873 75C865 65 857 62 846 61C833 61 810 60 781 60H708C676 60 667 68 667 91V396C777 448 874 513 933 566C952 558 968 561 976 572Z", "cx": 501.5, "cy": 366.5, "w": 949, "h": 905}, "中": {"d": "M786 333H561V600H786ZM598 833 436 849V629H223L90 681V205H108C159 205 213 233 213 246V304H436V-89H460C507 -89 561 -59 561 -45V304H786V221H807C848 221 910 243 911 250V580C931 584 945 593 951 601L833 691L777 629H561V804C588 808 596 819 598 833ZM213 333V600H436V333Z", "cx": 520.5, "cy": 380.0, "w": 861, "h": 938}, "發": {"d": "M115 710 107 703C139 680 171 635 176 595C200 580 222 580 239 588C183 524 111 468 28 428L35 415C99 432 157 455 209 482H315V367H256L149 414C141 351 122 240 105 162C156 150 182 153 206 166L212 201H313C306 103 292 42 275 28C267 22 259 21 244 21C224 21 159 24 120 28L119 14C158 7 192 -5 208 -21C224 -35 228 -61 227 -89C280 -89 315 -80 343 -61C388 -31 408 46 418 185C439 188 450 193 457 201L360 282L305 230H217L234 338H315V307H335C375 307 419 322 421 326V462C437 465 450 472 457 479L376 559L333 510H259C355 569 427 646 474 734C497 736 507 739 513 750L406 841L341 779H114L123 750H342C324 706 298 662 268 622C279 661 244 714 115 710ZM496 510V449C496 389 491 317 423 260L430 248C577 298 596 390 596 450V482H661V362C661 303 669 283 741 283H751L702 236H452L461 208H516C535 145 561 96 594 56C534 2 457 -42 365 -74L371 -87C479 -69 571 -38 647 6C704 -39 777 -67 867 -88C878 -31 907 9 954 24V36C874 40 800 49 735 68C775 104 808 145 833 192C856 193 865 197 872 206L782 283H790C882 283 917 300 917 338C917 356 911 366 888 376L884 431H874C863 405 852 384 845 376C841 372 834 371 828 371C823 371 812 371 803 371H774C762 371 760 373 760 383V474C772 475 780 479 785 483C815 464 846 447 879 432C896 487 929 524 976 533L978 545C914 561 850 582 790 611C834 627 879 646 912 664C934 659 943 664 949 673L836 747C821 716 789 665 758 627C722 647 688 669 658 694C707 713 757 737 791 757C814 751 823 756 828 766L717 840C700 807 666 756 633 716C593 754 561 798 538 850L525 843C560 719 617 626 693 555L651 510H611L496 561ZM641 107C598 131 563 164 537 208H702C687 172 667 138 641 107Z", "cx": 503.0, "cy": 380.5, "w": 950, "h": 939}};
+
+    const TILE_CATALOG = [
+      { id: 'dot8', group: 'dot', name: '八筒' },
+      { id: 'chr1', group: 'chr', name: '一', char: '一' },
+      { id: 'vita_phoenix', group: 'special', name: '火凤纹' },
+      { id: 'vita_pegasus', group: 'special', name: '赤天马' },
+      { id: 'bam3', group: 'bam', name: '三条' },
+      { id: 'hon_bai', group: 'honor', name: '白板' },
+      { id: 'hon_fa', group: 'honor', name: '发财', char: '發' },
+      { id: 'chr9', group: 'chr', name: '九', char: '九' },
+      { id: 'dot2', group: 'dot', name: '二筒' },
+      { id: 'dot3', group: 'dot', name: '三筒' },
+      { id: 'bam1', group: 'bam', name: '一条(幺鸡)' },
+      { id: 'hon_zhong', group: 'honor', name: '红中', char: '中' },
+      { id: 'dot1', group: 'dot', name: '一筒' },
+      { id: 'dot9', group: 'dot', name: '九筒' },
+      { id: 'chr2', group: 'chr', name: '二', char: '二' },
+      { id: 'chr3', group: 'chr', name: '三', char: '三' },
+      { id: 'bam2', group: 'bam', name: '二条' },
+      { id: 'bam4', group: 'bam', name: '四条' },
+      { id: 'bam5', group: 'bam', name: '五条' },
+      { id: 'bam6', group: 'bam', name: '六条' },
+      { id: 'bam7', group: 'bam', name: '七条' },
+      { id: 'bam8', group: 'bam', name: '八条' },
+      { id: 'bam9', group: 'bam', name: '九条' },
+      { id: 'dot4', group: 'dot', name: '四筒' },
+      { id: 'dot5', group: 'dot', name: '五筒' },
+      { id: 'dot6', group: 'dot', name: '六筒' },
+      { id: 'dot7', group: 'dot', name: '七筒' },
+      { id: 'chr4', group: 'chr', name: '四', char: '四' },
+      { id: 'chr5', group: 'chr', name: '伍', char: '伍' },
+      { id: 'chr6', group: 'chr', name: '六', char: '六' },
+      { id: 'chr7', group: 'chr', name: '七', char: '七' },
+      { id: 'chr8', group: 'chr', name: '八', char: '八' }
+    ];
+
+    // Crisp Concentric Mahjong Dot (筒子 — Large & High-Contrast like z9EgseVY5NQ 00:50 & l5TW4kcRN-c 00:08)
+    function renderDotCircle(cx, cy, r, color) {
+      return `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" />
+        <circle cx="${cx}" cy="${cy}" r="${r * 0.56}" fill="#fffdf7" />
+        <circle cx="${cx}" cy="${cy}" r="${r * 0.31}" fill="${color}" />
+      `;
+    }
+
+    // Bold 3D Knuckle-Jointed Bamboo Stick (条子 — Thick & Full-Face like l5TW4kcRN-c 00:08)
+    function renderBambooStick(x, y, w, h, color) {
+      const cx = x + w / 2;
+      const midY = y + h / 2;
+      const rEnd = w * 0.53;
+      return `
+        <g>
+          <rect x="${x + w * 0.06}" y="${y + 2}" width="${w * 0.88}" height="${h - 4}" rx="${w * 0.38}" fill="${color}" />
+          <ellipse cx="${cx}" cy="${y + 3.2}" rx="${rEnd}" ry="3.2" fill="${color}" />
+          <ellipse cx="${cx}" cy="${y + h - 3.2}" rx="${rEnd}" ry="3.2" fill="${color}" />
+          <ellipse cx="${cx}" cy="${midY}" rx="${rEnd}" ry="2.8" fill="${color}" />
+          <line x1="${cx}" y1="${y + 5}" x2="${cx}" y2="${midY - 3.5}" stroke="#fffdf7" stroke-width="${Math.max(1.8, w * 0.18)}" stroke-linecap="round" />
+          <line x1="${cx}" y1="${midY + 3.5}" x2="${cx}" y2="${y + h - 5}" stroke="#fffdf7" stroke-width="${Math.max(1.8, w * 0.18)}" stroke-linecap="round" />
+          <line x1="${x + 1}" y1="${midY}" x2="${x + w - 1}" y2="${midY}" stroke="#fffdf7" stroke-width="2.4" stroke-linecap="round" />
+        </g>
+      `;
+    }
+
+    // Exact Vector Glyph Renderer from NotoSerifCJK-Bold
+    function renderVectorGlyph(ch, color, scaleFactor = 0.066) {
+      const g = VECTOR_GLYPHS[ch];
+      if (!g) return '';
+      const extraStroke = (ch === '一' || ch === '二' || ch === '三') ? 38 : 22;
+      return `
+        <g transform="translate(42, 48) scale(${scaleFactor}, -${scaleFactor}) translate(-${g.cx}, -${g.cy})">
+          <path d="${g.d}" fill="${color}" stroke="${color}" stroke-width="${extraStroke}" stroke-linejoin="round" stroke-linecap="round" />
+        </g>
+      `;
+    }
+
+    // Inner Face Artwork (Drawn in 0..84 x 0..98 space)
+    function getFaceArtwork(tileId) {
+      const RED = '#c92626';
+      const GREEN = '#117543';
+      const BLUE = '#173f6e';
+      const NAVY = '#14263d';
+
+      switch (tileId) {
+        case 'dot1':
+          return `
+            <circle cx="42" cy="49" r="29" fill="#13385c" />
+            <circle cx="42" cy="49" r="21" fill="${GREEN}" />
+            <path d="M42,28 A21,21 0 0,0 42,70 Z" fill="${RED}" />
+            <circle cx="42" cy="49" r="10.5" fill="#fffdf7" />
+            <circle cx="42" cy="49" r="5" fill="#13385c" />
+          `;
+
+        case 'dot2':
+          return `
+            ${renderDotCircle(42, 26, 17.5, GREEN)}
+            ${renderDotCircle(42, 72, 17.5, BLUE)}
+          `;
+
+        case 'dot3':
+          return `
+            ${renderDotCircle(22, 22, 14, BLUE)}
+            ${renderDotCircle(42, 49, 14, RED)}
+            ${renderDotCircle(62, 76, 14, GREEN)}
+          `;
+
+        case 'dot4':
+          return `
+            ${renderDotCircle(25, 27, 15, BLUE)}
+            ${renderDotCircle(59, 27, 15, GREEN)}
+            ${renderDotCircle(25, 71, 15, GREEN)}
+            ${renderDotCircle(59, 71, 15, BLUE)}
+          `;
+
+        case 'dot5':
+          return `
+            ${renderDotCircle(23, 24, 12.5, BLUE)}
+            ${renderDotCircle(61, 24, 12.5, GREEN)}
+            ${renderDotCircle(42, 49, 12.5, RED)}
+            ${renderDotCircle(23, 74, 12.5, GREEN)}
+            ${renderDotCircle(61, 74, 12.5, BLUE)}
+          `;
+
+        case 'dot6':
+          return `
+            ${renderDotCircle(25, 22, 12.5, GREEN)}
+            ${renderDotCircle(59, 22, 12.5, GREEN)}
+            ${renderDotCircle(25, 52, 12.5, RED)}
+            ${renderDotCircle(59, 52, 12.5, RED)}
+            ${renderDotCircle(25, 77, 12.5, RED)}
+            ${renderDotCircle(59, 77, 12.5, RED)}
+          `;
+
+        case 'dot7':
+          return `
+            ${renderDotCircle(20, 19, 10.5, GREEN)}
+            ${renderDotCircle(42, 25, 10.5, GREEN)}
+            ${renderDotCircle(64, 31, 10.5, GREEN)}
+            ${renderDotCircle(26, 55, 12, RED)}
+            ${renderDotCircle(58, 55, 12, RED)}
+            ${renderDotCircle(26, 79, 12, RED)}
+            ${renderDotCircle(58, 79, 12, RED)}
+          `;
+
+        case 'dot8': // Large high-contrast 2x4 grid like l5TW4kcRN-c 00:08
+          return `
+            ${renderDotCircle(25, 16, 11.2, BLUE)}
+            ${renderDotCircle(59, 16, 11.2, BLUE)}
+            ${renderDotCircle(25, 38, 11.2, BLUE)}
+            ${renderDotCircle(59, 38, 11.2, BLUE)}
+            ${renderDotCircle(25, 60, 11.2, RED)}
+            ${renderDotCircle(59, 60, 11.2, RED)}
+            ${renderDotCircle(25, 82, 11.2, RED)}
+            ${renderDotCircle(59, 82, 11.2, RED)}
+          `;
+
+        case 'dot9': // Large edge-to-edge 3x3 grid like l5TW4kcRN-c 00:08
+          return `
+            ${renderDotCircle(18, 20, 11, BLUE)}
+            ${renderDotCircle(42, 20, 11, BLUE)}
+            ${renderDotCircle(66, 20, 11, BLUE)}
+            ${renderDotCircle(18, 49, 11, RED)}
+            ${renderDotCircle(42, 49, 11, RED)}
+            ${renderDotCircle(66, 49, 11, RED)}
+            ${renderDotCircle(18, 78, 11, GREEN)}
+            ${renderDotCircle(42, 78, 11, GREEN)}
+            ${renderDotCircle(66, 78, 11, GREEN)}
+          `;
+
+        case 'bam1': // Detailed Perched Songbird (幺鸡 — l5TW4kcRN-c 01:18)
+          return `
+            <path d="M12,72 Q42,66 72,73" stroke="${GREEN}" stroke-width="6" stroke-linecap="round" fill="none" />
+            <path d="M26,63 L10,79 L22,81 L34,67 Z" fill="${BLUE}" />
+            <path d="M24,63 C17,42 32,22 49,26 C58,28 61,40 54,53 C48,64 35,66 24,63 Z" fill="${GREEN}" />
+            <path d="M32,42 C44,40 52,48 48,59 C39,62 31,54 32,42 Z" fill="#e67700" />
+            <circle cx="48" cy="27" r="10.5" fill="${BLUE}" />
+            <circle cx="50" cy="25.5" r="2.6" fill="#ffffff" />
+            <polygon points="57,24 70,29 57,33" fill="${RED}" />
+          `;
+
+        case 'bam2':
+          return `
+            ${renderBambooStick(34, 10, 16, 37, GREEN)}
+            ${renderBambooStick(34, 51, 16, 37, GREEN)}
+          `;
+
+        case 'bam3':
+          return `
+            ${renderBambooStick(34, 10, 16, 37, GREEN)}
+            ${renderBambooStick(17, 51, 16, 37, GREEN)}
+            ${renderBambooStick(51, 51, 16, 37, GREEN)}
+          `;
+
+        case 'bam4':
+          return `
+            ${renderBambooStick(19, 10, 15, 37, GREEN)}
+            ${renderBambooStick(50, 10, 15, 37, GREEN)}
+            ${renderBambooStick(19, 51, 15, 37, GREEN)}
+            ${renderBambooStick(50, 51, 15, 37, GREEN)}
+          `;
+
+        case 'bam5':
+          return `
+            ${renderBambooStick(13, 10, 13, 37, GREEN)}
+            ${renderBambooStick(58, 10, 13, 37, GREEN)}
+            ${renderBambooStick(35.5, 30.5, 13, 37, RED)}
+            ${renderBambooStick(13, 51, 13, 37, GREEN)}
+            ${renderBambooStick(58, 51, 13, 37, GREEN)}
+          `;
+
+        case 'bam6':
+          return `
+            ${renderBambooStick(13, 10, 13.5, 37, GREEN)}
+            ${renderBambooStick(35.2, 10, 13.5, 37, GREEN)}
+            ${renderBambooStick(57.5, 10, 13.5, 37, GREEN)}
+            ${renderBambooStick(13, 51, 13.5, 37, GREEN)}
+            ${renderBambooStick(35.2, 51, 13.5, 37, GREEN)}
+            ${renderBambooStick(57.5, 51, 13.5, 37, GREEN)}
+          `;
+
+        case 'bam7':
+          return `
+            ${renderBambooStick(35.5, 7, 13, 26, RED)}
+            ${renderBambooStick(13, 36, 13, 26, GREEN)}
+            ${renderBambooStick(35.5, 36, 13, 26, BLUE)}
+            ${renderBambooStick(58, 36, 13, 26, GREEN)}
+            ${renderBambooStick(13, 65, 13, 26, GREEN)}
+            ${renderBambooStick(35.5, 65, 13, 26, BLUE)}
+            ${renderBambooStick(58, 65, 13, 26, GREEN)}
+          `;
+
+        case 'bam8':
+          return `
+            ${renderBambooStick(13, 10, 12.5, 37, GREEN)}
+            ${renderBambooStick(58.5, 10, 12.5, 37, GREEN)}
+            ${renderBambooStick(13, 51, 12.5, 37, GREEN)}
+            ${renderBambooStick(58.5, 51, 12.5, 37, GREEN)}
+            <rect x="24" y="23" width="36" height="8" rx="3.5" fill="${GREEN}" />
+            <rect x="24" y="67" width="36" height="8" rx="3.5" fill="${GREEN}" />
+            ${renderBambooStick(28, 26, 11, 46, GREEN)}
+            ${renderBambooStick(45, 26, 11, 46, GREEN)}
+          `;
+
+        case 'bam9':
+          return `
+            ${renderBambooStick(13, 8, 12.5, 26, GREEN)}
+            ${renderBambooStick(35.8, 8, 12.5, 26, RED)}
+            ${renderBambooStick(58.5, 8, 12.5, 26, GREEN)}
+            ${renderBambooStick(13, 36.5, 12.5, 26, GREEN)}
+            ${renderBambooStick(35.8, 36.5, 12.5, 26, RED)}
+            ${renderBambooStick(58.5, 36.5, 12.5, 26, GREEN)}
+            ${renderBambooStick(13, 65, 12.5, 26, GREEN)}
+            ${renderBambooStick(35.8, 65, 12.5, 26, RED)}
+            ${renderBambooStick(58.5, 65, 12.5, 26, GREEN)}
+          `;
+
+        case 'hon_bai': // White Dragon Double Emerald Frame (l5TW4kcRN-c 00:39)
+          return `
+            <rect x="13" y="12" width="58" height="74" rx="7" fill="none" stroke="${GREEN}" stroke-width="5.2" />
+            <rect x="20" y="19" width="44" height="60" rx="3.5" fill="none" stroke="${GREEN}" stroke-width="2.2" />
+          `;
+
+        case 'vita_phoenix': // Clean Crimson Swirling Phoenix Crest (l5TW4kcRN-c 00:16)
+          return `
+            <circle cx="42" cy="44" r="25" fill="none" stroke="${RED}" stroke-width="4.2" />
+            <path d="M42,19 A12.5,12.5 0 0,1 42,44 A12.5,12.5 0 0,0 42,69 A25,25 0 0,1 42,19 Z" fill="${RED}" />
+            <circle cx="42" cy="31.5" r="4" fill="#fffdf7" />
+            <circle cx="42" cy="56.5" r="4" fill="${RED}" />
+            <text x="42" y="87" text-anchor="middle" fill="${RED}" font-family="Georgia, serif" font-size="14" font-weight="900">14</text>
+          `;
+
+        case 'vita_pegasus': // Clean Crimson Rearing Winged Horse Crest (l5TW4kcRN-c 00:27)
+          return `
+            <g transform="translate(6, 4)">
+              <!-- Horse Head, Neck, Body & Rearing Legs -->
+              <path d="M44,12 L52,8 L50,17 L59,21 L55,27 L46,25 C46,31 49,37 55,44 L49,48 C44,43 41,39 38,38 C36,44 38,52 44,62 L36,64 C31,55 29,48 29,41 C22,44 17,50 13,58 L8,52 C13,43 20,36 28,33 C29,23 35,15 44,12 Z" fill="${RED}" />
+              <!-- Spread Wing -->
+              <path d="M32,30 C18,28 10,19 14,10 C22,12 29,19 35,27 Z" fill="${RED}" />
+              <path d="M28,36 C16,35 10,29 12,21 C19,23 25,28 30,33 Z" fill="#e03131" />
+            </g>
+            <text x="42" y="87" text-anchor="middle" fill="${RED}" font-family="Georgia, serif" font-size="14" font-weight="900">3</text>
+          `;
+
+        case 'hon_zhong':
+          return renderVectorGlyph('中', RED, 0.068);
+
+        case 'hon_fa':
+          return renderVectorGlyph('發', GREEN, 0.066);
+
+        default: {
+          const item = TILE_CATALOG.find(t => t.id === tileId);
+          const ch = item && item.char ? item.char : '一';
+          return renderVectorGlyph(ch, NAVY, 0.068);
+        }
+      }
+    }
+
+    // Complete 3D Mahjong Tile SVG Block (Includes Top Face + Cream-Bone Lip + Emerald-Green 3D Base)
+    function getTileSVG(tileId, status = 'open') {
+      let faceGrad = 'url(#gradIvoryFace)';
+      let faceStroke = '#d4cbb6';
+      let shadeOverlay = '';
+
+      if (status === 'covered' || status === 'locked') {
+        faceGrad = 'url(#gradSlateFace)';
+        faceStroke = '#5e6469';
+        shadeOverlay = `<rect x="1.5" y="1.5" width="81" height="96" rx="11" fill="rgba(20, 26, 32, 0.22)" />`;
+      } else if (status === 'hinted') {
+        faceGrad = 'url(#gradCyanFace)';
+        faceStroke = '#00acc1';
+      }
+
+      return `<svg viewBox="0 0 88 116">
+        <!-- Drop Shadow -->
+        <rect x="4" y="9" width="82" height="105" rx="12" fill="rgba(0, 0, 0, 0.42)" />
+        <!-- Emerald-Green 3D Base (Bottom & Right) -->
+        <rect x="2.5" y="10" width="81.5" height="102" rx="11.5" fill="url(#gradGreenBase)" stroke="#08381d" stroke-width="1" />
+        <!-- Cream-Bone 3D Chin/Bevel -->
+        <rect x="1.5" y="4.5" width="81.5" height="101" rx="11.5" fill="url(#gradBoneChin)" stroke="#bfb59b" stroke-width="1" />
+        <!-- Top Ivory/Slate Face -->
+        <rect x="1.5" y="1.5" width="81" height="96" rx="11" fill="${faceGrad}" stroke="${faceStroke}" stroke-width="1.4" />
+        <!-- Inner Specular Frame -->
+        <rect x="3.5" y="3.5" width="77" height="92" rx="9" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="1.2" />
+        <!-- Tile Face Artwork -->
+        ${getFaceArtwork(tileId)}
+        ${shadeOverlay}
+      </svg>`;
+    }
+
+    /*************************************************************************
+     * 3. PARTICLE & VISUAL FX ENGINE (Bamboo Leaves, Pink Sakura Petals, Stars)
+     *************************************************************************/
+    const fxCanvas = document.getElementById('fx-canvas');
+    const fxCtx = fxCanvas.getContext('2d');
+    let particles = [];
+    let shockwaves = [];
+
+    function resizeFxCanvas() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFxCanvas);
+    resizeFxCanvas();
+
+    function spawnMatchParticles(x, y, style = 'bamboo') {
+      shockwaves.push({
+        x, y,
+        r: 10,
+        maxR: 85,
+        alpha: 0.85,
+        color: style === 'sakura' ? 'rgba(255, 182, 193,' : 'rgba(120, 240, 160,'
+      });
+
+      const count = 18;
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+        const speed = 2.2 + Math.random() * 5.8;
+        particles.push({
+          type: style,
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.6,
+          gravity: 0.14,
+          rot: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.18,
+          size: 7 + Math.random() * 7,
+          alpha: 1
+        });
+      }
+
+      const scoreEl = document.getElementById('hud-score');
+      const rect = scoreEl.getBoundingClientRect();
+      const targetX = rect.left + rect.width / 2;
+      const targetY = rect.top + rect.height / 2;
+
+      for (let j = 0; j < 8; j++) {
+        particles.push({
+          type: 'star-trail',
+          x: x + (Math.random() - 0.5) * 18,
+          y: y + (Math.random() - 0.5) * 18,
+          tx: targetX,
+          ty: targetY,
+          progress: 0,
+          speed: 0.036 + j * 0.004,
+          size: 4.8 - j * 0.32,
+          alpha: 1
+        });
+      }
+    }
+
+    function spawnVictoryConfetti() {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      for (let i = 0; i < 60; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 8;
+        particles.push({
+          type: i % 2 === 0 ? 'bamboo' : 'sakura',
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 3,
+          gravity: 0.12,
+          rot: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.2,
+          size: 8 + Math.random() * 6,
+          alpha: 1
+        });
+      }
+    }
+
+    function updateAndDrawParticles() {
+      fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+      for (let i = shockwaves.length - 1; i >= 0; i--) {
+        const sw = shockwaves[i];
+        sw.r += (sw.maxR - sw.r) * 0.16;
+        sw.alpha -= 0.04;
+        if (sw.alpha <= 0) {
+          shockwaves.splice(i, 1);
+          continue;
+        }
+        fxCtx.save();
+        fxCtx.beginPath();
+        fxCtx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+        fxCtx.strokeStyle = `${sw.color}${sw.alpha})`;
+        fxCtx.lineWidth = 3;
+        fxCtx.stroke();
+        fxCtx.restore();
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.type === 'star-trail') {
+          p.progress += p.speed;
+          if (p.progress >= 1) {
+            particles.splice(i, 1);
+            continue;
+          }
+          const curX = p.x + (p.tx - p.x) * p.progress;
+          const curY = p.y + (p.ty - p.y) * p.progress - Math.sin(p.progress * Math.PI) * 40;
+          fxCtx.save();
+          fxCtx.fillStyle = `rgba(255, 230, 100, ${1 - p.progress * 0.5})`;
+          fxCtx.shadowColor = '#ffd700';
+          fxCtx.shadowBlur = 8;
+          fxCtx.beginPath();
+          fxCtx.arc(curX, curY, p.size, 0, Math.PI * 2);
+          fxCtx.fill();
+          fxCtx.restore();
+          continue;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.rot += p.vRot;
+        p.alpha -= 0.018;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        fxCtx.save();
+        fxCtx.translate(p.x, p.y);
+        fxCtx.rotate(p.rot);
+        fxCtx.globalAlpha = Math.max(0, p.alpha);
+
+        if (p.type === 'bamboo') {
+          const grad = fxCtx.createLinearGradient(-p.size, 0, p.size, 0);
+          grad.addColorStop(0, '#2ecc71');
+          grad.addColorStop(1, '#148f4b');
+          fxCtx.fillStyle = grad;
+          fxCtx.beginPath();
+          fxCtx.moveTo(-p.size * 1.2, 0);
+          fxCtx.quadraticCurveTo(0, -p.size * 0.55, p.size * 1.2, 0);
+          fxCtx.quadraticCurveTo(0, p.size * 0.55, -p.size * 1.2, 0);
+          fxCtx.fill();
+        } else {
+          const grad = fxCtx.createRadialGradient(0, 0, 1, 0, 0, p.size);
+          grad.addColorStop(0, '#ffe3ec');
+          grad.addColorStop(1, '#ff85a2');
+          fxCtx.fillStyle = grad;
+          fxCtx.beginPath();
+          fxCtx.moveTo(0, -p.size * 0.7);
+          fxCtx.bezierCurveTo(p.size * 0.8, -p.size, p.size * 0.9, p.size * 0.5, 0, p.size * 0.9);
+          fxCtx.bezierCurveTo(-p.size * 0.9, p.size * 0.5, -p.size * 0.8, -p.size, 0, -p.size * 0.7);
+          fxCtx.fill();
+        }
+        fxCtx.restore();
+      }
+
+      requestAnimationFrame(updateAndDrawParticles);
+    }
+    requestAnimationFrame(updateAndDrawParticles);
+
+    /*************************************************************************
+     * 4. LEVEL LAYOUTS (Replicating l5TW4kcRN-c 00:08 & z9EgseVY5NQ 00:50)
+     *************************************************************************/
+    const LEVEL_DEFINITIONS = [
+      {
+        level: 1,
+        title: 'Level 1',
+        // Replicates l5TW4kcRN-c 00:08 4-col x 6-row multi-layer board
+        buildCoords() {
+          const coords = [];
+          // Layer 0 (Base): 4 cols x 6 rows = 24 tiles
+          for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2, gz: 0 });
+            }
+          }
+          // Layer 1 (Staggered half-step gy - 1 on rows 1..4 so base tiles peek out as dark slate-gray): 16 tiles
+          for (let r = 1; r < 5; r++) {
+            for (let c = 0; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2 - 1, gz: 1 });
+            }
+          }
+          // Layer 2 (Top Stacks on cols 0, 1, 2): 8 tiles (Total = 48 tiles = 24 pairs)
+          const topCoords = [
+            { gx: 0, gy: 4, gz: 2 }, { gx: 2, gy: 4, gz: 2 }, { gx: 4, gy: 4, gz: 2 },
+            { gx: 0, gy: 6, gz: 2 }, { gx: 2, gy: 6, gz: 2 }, { gx: 4, gy: 6, gz: 2 },
+            { gx: 2, gy: 2, gz: 2 }, { gx: 2, gy: 8, gz: 2 }
+          ];
+          coords.push(...topCoords);
+          return coords;
+        }
+      },
+      {
+        level: 2,
+        title: 'Level 2',
+        // Replicates z9EgseVY5NQ 00:50 pyramid layout
+        buildCoords() {
+          const coords = [];
+          for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2, gz: 0 });
+            }
+          }
+          for (let r = 1; r < 5; r++) {
+            for (let c = 0; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2, gz: 1 });
+            }
+          }
+          for (let r = 1; r < 5; r++) {
+            for (let c = 1; c < 3; c++) {
+              coords.push({ gx: c * 2, gy: r * 2 - 1, gz: 2 });
+            }
+          }
+          return coords;
+        }
+      },
+      {
+        level: 3,
+        title: 'Level 3',
+        buildCoords() {
+          const coords = [];
+          for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 5; c++) {
+              if (c === 2 && (r === 0 || r === 5)) continue;
+              coords.push({ gx: c * 2, gy: r * 2, gz: 0 });
+            }
+          }
+          for (let r = 1; r < 5; r++) {
+            for (let c = 1; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2 - 1, gz: 1 });
+            }
+          }
+          for (let r = 2; r < 4; r++) {
+            for (let c = 1; c < 4; c++) {
+              coords.push({ gx: c * 2, gy: r * 2, gz: 2 });
+            }
+          }
+          return coords;
+        }
+      }
+    ];
+
+    /*************************************************************************
+     * 5. CORE GAME STATE & RULES
+     *************************************************************************/
+    const state = {
+      levelIndex: 0,
+      score: 600,
+      combo: 0,
+      maxCombo: 1,
+      lastMatchTime: 0,
+      tiles: [],
+      tray: [],
+      selectedUid: null,
+      hintedUids: [],
+      lockedFlashUid: null,
+      history: [],
+      shufflesLeft: 3,
+      hintsLeft: 3,
+      trayMode: true,
+      autoComplete: true,
+      startTime: Date.now(),
+      isAnimating: false
+    };
+
+    function isCoveredByAbove(tile, activeBoardTiles) {
+      for (const other of activeBoardTiles) {
+        if (other.uid === tile.uid) continue;
+        if (other.gz > tile.gz) {
+          const overlapX = Math.abs(other.gx - tile.gx) < 2;
+          const overlapY = Math.abs(other.gy - tile.gy) < 2;
+          if (overlapX && overlapY) return true;
+        }
+      }
+      return false;
+    }
+
+    function getLeftRightBlockers(tile, activeBoardTiles) {
+      let leftBlocker = null;
+      let rightBlocker = null;
+      for (const other of activeBoardTiles) {
+        if (other.uid === tile.uid || other.gz !== tile.gz) continue;
+        const overlapY = Math.abs(other.gy - tile.gy) < 2;
+        if (!overlapY) continue;
+        if (other.gx >= tile.gx - 2 && other.gx < tile.gx) {
+          leftBlocker = other;
+        }
+        if (other.gx <= tile.gx + 2 && other.gx > tile.gx) {
+          rightBlocker = other;
+        }
+      }
+      return { leftBlocker, rightBlocker };
+    }
+
+    function isTilePlayable(tile, activeBoardTiles) {
+      if (tile.removed || tile.inTray) return false;
+      if (isCoveredByAbove(tile, activeBoardTiles)) return false;
+      const { leftBlocker, rightBlocker } = getLeftRightBlockers(tile, activeBoardTiles);
+      return !(leftBlocker && rightBlocker);
+    }
+
+    function getActiveBoardTiles() {
+      return state.tiles.filter(t => !t.removed && !t.inTray);
+    }
+
+    function assignSolvableFaces(coords) {
+      const tempNodes = coords.map((c, idx) => ({
+        uid: idx + 1,
+        gx: c.gx,
+        gy: c.gy,
+        gz: c.gz,
+        removed: false,
+        inTray: false,
+        typeId: null
+      }));
+
+      // Exact top-layer signature faces from l5TW4kcRN-c 00:08
+      const signatureOrder = [
+        'dot8', 'chr6', 'hon_fa', 'bam3', 'chr5', 'bam2',
+        'bam4', 'dot8', 'dot9', 'hon_zhong', 'chr9', 'dot2',
+        'chr4', 'bam1', 'bam6', 'dot3', 'hon_bai', 'chr2',
+        'bam8', 'chr3', 'dot1', 'chr8', 'dot4', 'bam2'
+      ];
+
+      const remaining = [...tempNodes];
+      let pairIdx = 0;
+      while (remaining.length >= 2) {
+        const playable = remaining.filter(t => isTilePlayable(t, remaining));
+        let pick1, pick2;
+        if (playable.length >= 2) {
+          playable.sort((a, b) => b.gz - a.gz || a.gy - b.gy);
+          pick1 = playable[0];
+          pick2 = playable[1];
+        } else {
+          pick1 = remaining[0];
+          pick2 = remaining[1];
+        }
+        const faceId = signatureOrder[pairIdx % signatureOrder.length];
+        pairIdx++;
+        pick1.typeId = faceId;
+        pick2.typeId = faceId;
+        remaining.splice(remaining.indexOf(pick1), 1);
+        remaining.splice(remaining.indexOf(pick2), 1);
+      }
+
+      return tempNodes;
+    }
+
+    function getAvailablePairs() {
+      const active = getActiveBoardTiles();
+      const playable = active.filter(t => isTilePlayable(t, active));
+      const pool = [...state.tray, ...playable];
+      const byType = {};
+      for (const t of pool) {
+        if (!byType[t.typeId]) byType[t.typeId] = [];
+        byType[t.typeId].push(t);
+      }
+      const pairs = [];
+      for (const typeId of Object.keys(byType)) {
+        const list = byType[typeId];
+        if (list.length >= 2) {
+          const boardOnes = list.filter(x => !x.inTray);
+          if (boardOnes.length >= 1) {
+            pairs.push([list[0], list[1]]);
+          }
+        }
+      }
+      return pairs;
+    }
+
+    /*************************************************************************
+     * 6. RENDERING THE MOBILE MAHJONG BOARD & TOP WOODEN TRAY
+     *************************************************************************/
+    const boardStage = document.getElementById('board-stage');
+    const boardViewport = document.getElementById('board-viewport');
+
+    function renderGame() {
+      const active = getActiveBoardTiles();
+      const pairs = getAvailablePairs();
+
+      document.getElementById('hud-level').textContent = state.levelIndex + 1;
+      document.getElementById('hud-score').textContent = state.score;
+      document.getElementById('hud-matches').textContent = pairs.length;
+      document.getElementById('badge-shuffle').textContent = state.shufflesLeft;
+      document.getElementById('badge-hint').textContent = state.hintsLeft;
+      document.getElementById('home-level-label').textContent = `Level ${state.levelIndex + 1}`;
+      const levelDef = LEVEL_DEFINITIONS[state.levelIndex % LEVEL_DEFINITIONS.length];
+      document.getElementById('bottom-level-name').textContent = levelDef.title;
+      document.getElementById('mode-badge-text').textContent = state.trayMode ? '牌槽模式' : '直接配对模式';
+
+      // Render Top Wooden Staging Tray
+      const trayContainer = document.getElementById('staging-slots');
+      trayContainer.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const slotTile = state.tray[i];
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'tray-empty-slot';
+        slotDiv.id = `tray-slot-${i}`;
+        if (slotTile) {
+          const tileEl = document.createElement('div');
+          tileEl.className = 'tray-slot-tile';
+          const isH = state.hintedUids.includes(slotTile.uid);
+          tileEl.innerHTML = getTileSVG(slotTile.typeId, isH ? 'hinted' : 'open');
+          slotDiv.appendChild(tileEl);
+        }
+        trayContainer.appendChild(slotDiv);
+      }
+
+      if (state.tiles.length === 0) return;
+      let maxGx = 0, maxGy = 0;
+      for (const t of state.tiles) {
+        if (t.gx + 2 > maxGx) maxGx = t.gx + 2;
+        if (t.gy + 2 > maxGy) maxGy = t.gy + 2;
+      }
+
+      const vw = Math.max(280, boardViewport.clientWidth - 12);
+      const vh = Math.max(340, boardViewport.clientHeight - 16);
+      const cols = maxGx / 2;
+      const rows = maxGy / 2;
+
+      // In viewBox="0 0 88 116", top face is 81x96 (aspect 1.185), full 3D block is 88x116 (aspect 1.318)
+      // Rows step vertically by face height so tiles touch edge-to-edge while showing 3D chin+green base!
+      const blockAspect = 114 / 88;
+      let tileW = Math.min(vw / (cols + 0.15), (vh / (rows + 0.45)) / blockAspect);
+      tileW = Math.max(54, Math.min(76, Math.floor(tileW)));
+      const fullTileH = Math.floor(tileW * (116 / 88));
+
+      const stepX = Math.floor((tileW - 2) / 2);
+      const stepY = Math.floor((fullTileH - 7) / 2);
+
+      const boardW = maxGx * stepX + 14;
+      const boardH = maxGy * stepY + 26;
+      boardStage.style.width = `${boardW}px`;
+      boardStage.style.height = `${boardH}px`;
+
+      // Painter's algorithm sort: lower layer first, then top-to-bottom (gy), then left-to-right (gx)
+      const sorted = [...active].sort((a, b) => {
+        if (a.gz !== b.gz) return a.gz - b.gz;
+        if (a.gy !== b.gy) return a.gy - b.gy;
+        return a.gx - b.gx;
+      });
+
+      boardStage.innerHTML = '';
+      sorted.forEach((tile, renderOrder) => {
+        const covered = isCoveredByAbove(tile, active);
+        const isSelected = state.selectedUid === tile.uid;
+        const isHinted = state.hintedUids.includes(tile.uid);
+        const isLockedFlash = state.lockedFlashUid === tile.uid;
+
+        // Higher layers shift up (-9px per layer) and slightly left (-3px) so lower 3D green+bone steps stick out!
+        const layerOffsetX = -tile.gz * 3;
+        const layerOffsetY = -tile.gz * 9;
+        const leftPx = tile.gx * stepX + 6 + layerOffsetX;
+        const topPx = tile.gy * stepY + 12 + layerOffsetY;
+
+        const el = document.createElement('div');
+        el.id = `tile-${tile.uid}`;
+        el.className = 'mahjong-tile';
+        if (covered) el.classList.add('tile-covered');
+        if (isSelected) el.classList.add('tile-selected');
+        if (isHinted) el.classList.add('tile-hinted');
+        if (isLockedFlash) el.classList.add('tile-locked-flash');
+
+        el.style.width = `${tileW}px`;
+        el.style.height = `${fullTileH}px`;
+        el.style.left = `${leftPx}px`;
+        el.style.top = `${topPx}px`;
+        el.style.zIndex = `${tile.gz * 200 + tile.gy * 10 + renderOrder}`;
+
+        let visualStatus = 'open';
+        if (isLockedFlash) visualStatus = 'locked';
+        else if (isHinted) visualStatus = 'hinted';
+        else if (covered) visualStatus = 'covered';
+
+        el.innerHTML = getTileSVG(tile.typeId, visualStatus);
+
+        if (isHinted) {
+          const thumb = document.createElement('div');
+          thumb.className = 'hint-thumb-badge';
+          thumb.textContent = '👍';
+          el.appendChild(thumb);
+        }
+
+        if (isLockedFlash) {
+          const lockL = document.createElement('div');
+          lockL.className = 'edge-padlock edge-padlock-left';
+          lockL.textContent = '🔒';
+          const lockR = document.createElement('div');
+          lockR.className = 'edge-padlock edge-padlock-right';
+          lockR.textContent = '🔒';
+          el.appendChild(lockL);
+          el.appendChild(lockR);
+        }
+
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onTileTap(tile, el);
+        });
+
+        boardStage.appendChild(el);
+      });
+    }
+
+    /*************************************************************************
+     * 7. INTERACTION HANDLERS: FLYING TILE ANIMATION, LOCKED TOAST & MATCHING
+     *************************************************************************/
+    let lockedToastTimer = null;
+
+    function triggerLockedFeedback(tile) {
+      audio.playLockedSound();
+      state.lockedFlashUid = tile.uid;
+      renderGame();
+
+      const toast = document.getElementById('locked-toast');
+      toast.style.opacity = '1';
+
+      if (lockedToastTimer) clearTimeout(lockedToastTimer);
+      lockedToastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+        state.lockedFlashUid = null;
+        renderGame();
+      }, 1150);
+    }
+
+    function animateFlyingTile(sourceRect, targetRect, typeId, onComplete) {
+      const clone = document.createElement('div');
+      clone.className = 'flying-tile-clone';
+      clone.style.left = `${sourceRect.left}px`;
+      clone.style.top = `${sourceRect.top}px`;
+      clone.style.width = `${sourceRect.width}px`;
+      clone.style.height = `${sourceRect.height}px`;
+      clone.innerHTML = getTileSVG(typeId, 'open');
+      document.body.appendChild(clone);
+
+      requestAnimationFrame(() => {
+        clone.style.left = `${targetRect.left}px`;
+        clone.style.top = `${targetRect.top}px`;
+        clone.style.width = `${targetRect.width}px`;
+        clone.style.height = `${targetRect.height}px`;
+      });
+
+      setTimeout(() => {
+        clone.remove();
+        onComplete();
+      }, 200);
+    }
+
+    function showTrayScoreAndCombo(pointsAdded, isPerfect) {
+      const popup = document.getElementById('tray-score-popup');
+      const popupText = document.getElementById('tray-score-text');
+      popupText.textContent = `+${pointsAdded}`;
+      popup.style.opacity = '1';
+      popup.style.transform = 'translateY(-4px)';
+      setTimeout(() => {
+        popup.style.opacity = '0';
+        popup.style.transform = 'translateY(0px)';
+      }, 680);
+
+      if (state.combo >= 2 || isPerfect) {
+        const banner = document.getElementById('combo-banner');
+        const title = document.getElementById('combo-title');
+        const sub = document.getElementById('combo-sub');
+
+        if (isPerfect) {
+          title.textContent = 'Perfect';
+          title.className = 'combo-title-perfect';
+          sub.textContent = state.combo > 1 ? `Combo x${state.combo}` : '';
+          audio.speakCombo('Perfect');
+        } else {
+          title.textContent = 'Good';
+          title.className = 'combo-title-good';
+          sub.textContent = `Combo x${state.combo}`;
+          if (state.combo % 2 === 0) audio.speakCombo('Good');
+        }
+
+        banner.classList.remove('combo-banner-anim');
+        void banner.offsetWidth;
+        banner.classList.add('combo-banner-anim');
+
+        const scoreEl = document.getElementById('hud-score');
+        scoreEl.classList.add('score-combo-glow');
+        setTimeout(() => scoreEl.classList.remove('score-combo-glow'), 900);
+      }
+    }
+
+    function executePairMatch(tileA, tileB, burstX, burstY, wasHinted = false) {
+      const now = Date.now();
+      if (now - state.lastMatchTime < 5000) {
+        state.combo++;
+      } else {
+        state.combo = 1;
+      }
+      if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+      state.lastMatchTime = now;
+
+      const points = 200 + state.combo * 40;
+      const prevScore = state.score;
+      state.score += points;
+
+      animateScoreIncrement(prevScore, state.score);
+
+      const pStyle = state.combo >= 3 ? 'sakura' : 'bamboo';
+      spawnMatchParticles(burstX, burstY, pStyle);
+      audio.playMatchSound(state.combo);
+      showTrayScoreAndCombo(points, wasHinted || state.combo >= 3);
+
+      setTimeout(() => {
+        checkBoardStatus();
+      }, 240);
+    }
+
+    function animateScoreIncrement(fromVal, toVal) {
+      const el = document.getElementById('hud-score');
+      const start = performance.now();
+      const dur = 300;
+      function step(ts) {
+        const p = Math.min(1, (ts - start) / dur);
+        el.textContent = Math.floor(fromVal + (toVal - fromVal) * p);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function onTileTap(tile, tileEl) {
+      if (state.isAnimating) return;
+      const active = getActiveBoardTiles();
+
+      if (isCoveredByAbove(tile, active)) {
+        audio.playLockedSound();
+        tileEl.classList.add('tile-locked-flash');
+        setTimeout(() => tileEl.classList.remove('tile-locked-flash'), 360);
+        return;
+      }
+
+      const { leftBlocker, rightBlocker } = getLeftRightBlockers(tile, active);
+      if (leftBlocker && rightBlocker) {
+        triggerLockedFeedback(tile);
+        return;
+      }
+
+      const wasHinted = state.hintedUids.includes(tile.uid);
+      state.hintedUids = [];
+      state.lockedFlashUid = null;
+      audio.playTileClick();
+
+      const sourceRect = tileEl.getBoundingClientRect();
+
+      if (state.trayMode) {
+        const matchIdx = state.tray.findIndex(t => t.typeId === tile.typeId);
+        if (matchIdx !== -1) {
+          const partner = state.tray[matchIdx];
+          state.history.push({
+            action: 'tray-match',
+            tileUid: tile.uid,
+            partnerUid: partner.uid
+          });
+
+          const targetSlotIdx = Math.min(3, matchIdx + 1);
+          const slotEl = document.getElementById(`tray-slot-${targetSlotIdx}`) || document.getElementById('staging-tray-container');
+          const targetRect = slotEl.getBoundingClientRect();
+
+          state.isAnimating = true;
+          tile.inTray = true;
+          renderGame();
+
+          animateFlyingTile(sourceRect, targetRect, tile.typeId, () => {
+            state.tray.splice(matchIdx + 1, 0, tile);
+            renderGame();
+
+            const trayRect = document.getElementById('staging-tray-container').getBoundingClientRect();
+            const burstX = trayRect.left + trayRect.width / 2;
+            const burstY = trayRect.top + trayRect.height / 2;
+
+            setTimeout(() => {
+              tile.inTray = false;
+              tile.removed = true;
+              partner.inTray = false;
+              partner.removed = true;
+              state.tray = state.tray.filter(t => t.uid !== tile.uid && t.uid !== partner.uid);
+              state.isAnimating = false;
+              renderGame();
+              executePairMatch(tile, partner, burstX, burstY, wasHinted);
+            }, 125);
+          });
+        } else {
+          if (state.tray.length >= 4) {
+            const oldest = state.tray.shift();
+            oldest.inTray = false;
+          }
+          const targetSlotIdx = state.tray.length;
+          const slotEl = document.getElementById(`tray-slot-${targetSlotIdx}`) || document.getElementById('staging-tray-container');
+          const targetRect = slotEl.getBoundingClientRect();
+
+          state.history.push({
+            action: 'tray-put',
+            tileUid: tile.uid
+          });
+
+          state.isAnimating = true;
+          tile.inTray = true;
+          renderGame();
+
+          animateFlyingTile(sourceRect, targetRect, tile.typeId, () => {
+            state.tray.push(tile);
+            state.isAnimating = false;
+            renderGame();
+          });
+        }
+        return;
+      }
+
+      // CLASSIC DIRECT PAIR MATCHING MODE
+      if (state.selectedUid === tile.uid) {
+        state.selectedUid = null;
+        renderGame();
+        return;
+      }
+
+      if (state.selectedUid === null) {
+        state.selectedUid = tile.uid;
+        renderGame();
+        return;
+      }
+
+      const prevTile = state.tiles.find(t => t.uid === state.selectedUid);
+      if (prevTile && prevTile.typeId === tile.typeId) {
+        state.history.push({
+          action: 'direct-match',
+          tileUid: tile.uid,
+          partnerUid: prevTile.uid
+        });
+        state.selectedUid = null;
+        prevTile.removed = true;
+        tile.removed = true;
+        renderGame();
+        executePairMatch(prevTile, tile, sourceRect.left + sourceRect.width / 2, sourceRect.top + sourceRect.height / 2, wasHinted);
+      } else {
+        state.selectedUid = tile.uid;
+        renderGame();
+      }
+    }
+
+    function playDemoStep() {
+      if (state.isAnimating) return;
+      const pairs = getAvailablePairs();
+      if (pairs.length === 0) {
+        shuffleBoard(true);
+        return;
+      }
+      const [first, second] = pairs[0];
+      state.hintedUids = [first.uid, second.uid];
+      renderGame();
+
+      if (first.inTray) {
+        const el2 = document.getElementById(`tile-${second.uid}`);
+        if (el2) onTileTap(second, el2);
+      } else {
+        const el1 = document.getElementById(`tile-${first.uid}`);
+        if (el1) {
+          onTileTap(first, el1);
+          setTimeout(() => {
+            const el2 = document.getElementById(`tile-${second.uid}`);
+            if (el2) onTileTap(second, el2);
+          }, 330);
+        }
+      }
+    }
+
+    function checkBoardStatus() {
+      const remaining = state.tiles.filter(t => !t.removed);
+      if (remaining.length === 0) {
+        audio.playVictoryFanfare();
+        spawnVictoryConfetti();
+        showVictoryModal();
+        return;
+      }
+
+      const activeBoard = getActiveBoardTiles();
+      if (state.autoComplete && remaining.length <= 6 && activeBoard.every(t => t.gz === 0 && isTilePlayable(t, activeBoard))) {
+        autoFinishRemaining();
+        return;
+      }
+
+      const pairs = getAvailablePairs();
+      if (pairs.length === 0 && activeBoard.length > 0) {
+        showModalToast('No moves left — Auto Shuffling!');
+        setTimeout(() => shuffleBoard(true), 550);
+      }
+    }
+
+    function autoFinishRemaining() {
+      if (state.isAnimating) return;
+      const remaining = state.tiles.filter(t => !t.removed);
+      if (remaining.length === 0) {
+        audio.playVictoryFanfare();
+        spawnVictoryConfetti();
+        showVictoryModal();
+        return;
+      }
+      state.isAnimating = true;
+      const t1 = remaining[0];
+      const t2 = remaining.find(t => t.uid !== t1.uid && t.typeId === t1.typeId) || remaining[1];
+      t1.removed = true;
+      t1.inTray = false;
+      if (t2) {
+        t2.removed = true;
+        t2.inTray = false;
+      }
+      state.tray = state.tray.filter(t => !t.removed);
+      renderGame();
+
+      const trayRect = document.getElementById('staging-tray-container').getBoundingClientRect();
+      spawnMatchParticles(trayRect.left + trayRect.width / 2, trayRect.top + trayRect.height / 2, 'sakura');
+      audio.playMatchSound(state.combo + 1);
+      state.score += 320;
+      document.getElementById('hud-score').textContent = state.score;
+
+      setTimeout(() => {
+        state.isAnimating = false;
+        autoFinishRemaining();
+      }, 220);
+    }
+
+    /*************************************************************************
+     * 8. POWER-UP TOOLS: SHUFFLE, HINT (👍), UNDO (Free)
+     *************************************************************************/
+    function shuffleBoard(isAuto = false) {
+      const active = getActiveBoardTiles();
+      if (active.length === 0) return;
+
+      if (!isAuto) {
+        state.shufflesLeft = state.shufflesLeft > 0 ? state.shufflesLeft - 1 : 3;
+      }
+
+      audio.playDoorSlide();
+      for (const t of state.tray) t.inTray = false;
+      state.tray = [];
+      state.selectedUid = null;
+      state.hintedUids = [];
+
+      const unremoved = state.tiles.filter(t => !t.removed);
+      const coords = unremoved.map(t => ({ gx: t.gx, gy: t.gy, gz: t.gz }));
+      const reassigned = assignSolvableFaces(coords);
+      unremoved.forEach((t, i) => {
+        t.typeId = reassigned[i].typeId;
+      });
+
+      boardStage.style.transform = 'scale(0.88)';
+      boardStage.style.opacity = '0.4';
+      setTimeout(() => {
+        renderGame();
+        boardStage.style.transform = 'scale(1)';
+        boardStage.style.opacity = '1';
+      }, 120);
+    }
+
+    function triggerHint(freeOnboarding = false) {
+      const pairs = getAvailablePairs();
+      if (pairs.length === 0) {
+        shuffleBoard(true);
+        return;
+      }
+      if (!freeOnboarding) {
+        state.hintsLeft = state.hintsLeft > 0 ? state.hintsLeft - 1 : 3;
+        audio.playTileClick();
+      }
+      const [first, second] = pairs[0];
+      state.hintedUids = [first.uid, second.uid];
+      renderGame();
+    }
+
+    function triggerUndo() {
+      if (state.history.length === 0) {
+        showModalToast('No moves to undo');
+        return;
+      }
+      audio.playTileClick();
+      const last = state.history.pop();
+      if (last.action === 'tray-put') {
+        const tile = state.tiles.find(t => t.uid === last.tileUid);
+        if (tile) tile.inTray = false;
+        state.tray = state.tray.filter(t => t.uid !== last.tileUid);
+      } else if (last.action === 'tray-match') {
+        const t1 = state.tiles.find(t => t.uid === last.tileUid);
+        const t2 = state.tiles.find(t => t.uid === last.partnerUid);
+        if (t1) { t1.removed = false; t1.inTray = false; }
+        if (t2) { t2.removed = false; t2.inTray = true; state.tray.push(t2); }
+      } else if (last.action === 'direct-match') {
+        const t1 = state.tiles.find(t => t.uid === last.tileUid);
+        const t2 = state.tiles.find(t => t.uid === last.partnerUid);
+        if (t1) t1.removed = false;
+        if (t2) t2.removed = false;
+      }
+      state.hintedUids = [];
+      renderGame();
+    }
+
+    /*************************************************************************
+     * 9. LEVEL INITIALIZATION & SHOJI DOOR TRANSITION
+     *************************************************************************/
+    function startLevel(idx) {
+      state.levelIndex = (idx + LEVEL_DEFINITIONS.length) % LEVEL_DEFINITIONS.length;
+      const def = LEVEL_DEFINITIONS[state.levelIndex];
+      const coords = def.buildCoords();
+      state.tiles = assignSolvableFaces(coords);
+      state.tray = [];
+      state.selectedUid = null;
+      state.hintedUids = [];
+      state.lockedFlashUid = null;
+      state.history = [];
+      state.combo = 0;
+      state.maxCombo = 1;
+      state.startTime = Date.now();
+      renderGame();
+    }
+
+    function openShojiDoorsAndPlay() {
+      audio.playDoorSlide();
+      const homeScreen = document.getElementById('home-screen');
+      const halo = document.getElementById('door-halo');
+      halo.style.opacity = '1';
+      halo.style.transform = 'scale(1.45)';
+
+      spawnMatchParticles(window.innerWidth / 2, window.innerHeight / 2, 'bamboo');
+
+      setTimeout(() => {
+        homeScreen.classList.add('doors-open');
+      }, 80);
+
+      setTimeout(() => {
+        homeScreen.classList.add('hidden');
+      }, 820);
+    }
+
+    function returnToHomeDoors() {
+      audio.playDoorSlide();
+      const homeScreen = document.getElementById('home-screen');
+      const halo = document.getElementById('door-halo');
+      homeScreen.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        homeScreen.classList.remove('doors-open');
+        halo.style.opacity = '0';
+        halo.style.transform = 'scale(0.75)';
+      });
+    }
+
+    function showVictoryModal() {
+      const elapsedSec = Math.max(1, Math.floor((Date.now() - state.startTime) / 1000));
+      const mm = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+      const ss = String(elapsedSec % 60).padStart(2, '0');
+      document.getElementById('win-score').textContent = state.score.toLocaleString();
+      document.getElementById('win-combo').textContent = `Combo x${state.maxCombo}`;
+      document.getElementById('win-time').textContent = `${mm}:${ss}`;
+      document.getElementById('victory-modal').classList.remove('hidden');
+    }
+
+    let modalToastTimer = null;
+    function showModalToast(msg) {
+      const t = document.getElementById('modal-status-toast');
+      t.textContent = msg;
+      t.style.opacity = '1';
+      if (modalToastTimer) clearTimeout(modalToastTimer);
+      modalToastTimer = setTimeout(() => {
+        t.style.opacity = '0';
+      }, 1200);
+    }
+
+    /*************************************************************************
+     * 10. UI EVENT LISTENERS & INITIALIZATION
+     *************************************************************************/
+    window.addEventListener('resize', () => renderGame());
+
+    document.getElementById('btn-start-level').addEventListener('click', openShojiDoorsAndPlay);
+    document.getElementById('btn-daily-mode').addEventListener('click', () => {
+      startLevel(1);
+      openShojiDoorsAndPlay();
+    });
+    document.getElementById('btn-challenge-mode').addEventListener('click', () => {
+      startLevel(2);
+      openShojiDoorsAndPlay();
+    });
+    document.getElementById('btn-journey-mode').addEventListener('click', () => {
+      startLevel(2);
+      openShojiDoorsAndPlay();
+    });
+
+    document.getElementById('btn-back-home').addEventListener('click', returnToHomeDoors);
+    document.getElementById('btn-shuffle').addEventListener('click', () => shuffleBoard(false));
+    document.getElementById('btn-hint').addEventListener('click', () => triggerHint(false));
+    document.getElementById('btn-undo').addEventListener('click', triggerUndo);
+    document.getElementById('btn-demo-move').addEventListener('click', playDemoStep);
+
+    document.getElementById('btn-prev-level').addEventListener('click', () => startLevel(state.levelIndex - 1));
+    document.getElementById('btn-next-level').addEventListener('click', () => startLevel(state.levelIndex + 1));
+
+    document.getElementById('btn-toggle-mode').addEventListener('click', () => {
+      state.trayMode = !state.trayMode;
+      if (!state.trayMode) {
+        for (const t of state.tray) t.inTray = false;
+        state.tray = [];
+      }
+      syncOptionsUI();
+      renderGame();
+      showModalToast(state.trayMode ? 'Tray Mode ON' : 'Direct Pair Mode ON');
+    });
+
+    document.getElementById('btn-quick-audio').addEventListener('click', () => {
+      audio.init();
+      audio.soundOn = !audio.soundOn;
+      audio.musicOn = audio.soundOn;
+      document.getElementById('btn-quick-audio').textContent = audio.soundOn ? '🔊' : '🔇';
+      syncOptionsUI();
+      showModalToast(audio.soundOn ? 'Sound is on' : 'Sound is off');
+    });
+
+    const optionsModal = document.getElementById('options-modal');
+    function openOptionsModal() {
+      audio.playTileClick();
+      syncOptionsUI();
+      optionsModal.classList.remove('hidden');
+    }
+    function closeOptionsModal() {
+      audio.playTileClick();
+      optionsModal.classList.add('hidden');
+    }
+    document.getElementById('btn-open-options').addEventListener('click', openOptionsModal);
+    document.getElementById('btn-home-settings').addEventListener('click', openOptionsModal);
+    document.getElementById('btn-close-options').addEventListener('click', closeOptionsModal);
+
+    function syncOptionsUI() {
+      const mBtn = document.getElementById('toggle-music');
+      mBtn.textContent = audio.musicOn ? 'ON' : 'OFF';
+      mBtn.className = `switch-pill ${audio.musicOn ? 'switch-on' : 'switch-off'}`;
+      document.getElementById('icon-music-state').textContent = audio.musicOn ? '🎵' : '🔇';
+
+      const sBtn = document.getElementById('toggle-sound');
+      sBtn.textContent = audio.soundOn ? 'ON' : 'OFF';
+      sBtn.className = `switch-pill ${audio.soundOn ? 'switch-on' : 'switch-off'}`;
+      document.getElementById('icon-sound-state').textContent = audio.soundOn ? '🔊' : '🔇';
+
+      const bBtn = document.getElementById('toggle-birds');
+      bBtn.textContent = audio.birdsOn ? 'ON' : 'OFF';
+      bBtn.className = `switch-pill ${audio.birdsOn ? 'switch-on' : 'switch-off'}`;
+
+      const tBtn = document.getElementById('toggle-tray-mode');
+      tBtn.textContent = state.trayMode ? 'ON' : 'OFF';
+      tBtn.className = `switch-pill ${state.trayMode ? 'switch-on' : 'switch-off'}`;
+
+      const aBtn = document.getElementById('toggle-autocomplete');
+      aBtn.textContent = state.autoComplete ? 'ON' : 'OFF';
+      aBtn.className = `switch-pill ${state.autoComplete ? 'switch-on' : 'switch-off'}`;
+    }
+
+    document.getElementById('toggle-music').addEventListener('click', () => {
+      audio.init();
+      audio.musicOn = !audio.musicOn;
+      syncOptionsUI();
+      showModalToast(audio.musicOn ? 'Music is on' : 'Music is off');
+    });
+
+    document.getElementById('toggle-sound').addEventListener('click', () => {
+      audio.init();
+      audio.soundOn = !audio.soundOn;
+      document.getElementById('btn-quick-audio').textContent = audio.soundOn ? '🔊' : '🔇';
+      syncOptionsUI();
+      showModalToast(audio.soundOn ? 'Sound is on' : 'Sound is off');
+    });
+
+    document.getElementById('toggle-birds').addEventListener('click', () => {
+      audio.init();
+      audio.birdsOn = !audio.birdsOn;
+      if (audio.birdsOn) audio.playBirdChirp();
+      syncOptionsUI();
+      showModalToast(audio.birdsOn ? 'Haptics & Ambient ON' : 'Haptics & Ambient OFF');
+    });
+
+    document.getElementById('toggle-tray-mode').addEventListener('click', () => {
+      state.trayMode = !state.trayMode;
+      if (!state.trayMode) {
+        for (const t of state.tray) t.inTray = false;
+        state.tray = [];
+      }
+      syncOptionsUI();
+      renderGame();
+    });
+
+    document.getElementById('toggle-autocomplete').addEventListener('click', () => {
+      state.autoComplete = !state.autoComplete;
+      syncOptionsUI();
+    });
+
+    const themes = ['emerald', 'crimson', 'wood'];
+    let currentThemeIdx = 0;
+    function applyTheme(themeName) {
+      document.body.classList.remove('theme-emerald', 'theme-crimson', 'theme-wood');
+      document.body.classList.add(`theme-${themeName}`);
+      document.querySelectorAll('.theme-pick-btn').forEach(btn => {
+        if (btn.dataset.theme === themeName) {
+          btn.classList.add('active-theme');
+        } else {
+          btn.classList.remove('active-theme');
+        }
+      });
+    }
+    document.querySelectorAll('.theme-pick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyTheme(btn.dataset.theme);
+        showModalToast(`Theme: ${btn.textContent}`);
+      });
+    });
+    document.getElementById('btn-home-theme').addEventListener('click', () => {
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      applyTheme(themes[currentThemeIdx]);
+    });
+
+    document.getElementById('btn-modal-restart').addEventListener('click', () => {
+      closeOptionsModal();
+      startLevel(state.levelIndex);
+    });
+
+    document.getElementById('btn-next-stage').addEventListener('click', () => {
+      document.getElementById('victory-modal').classList.add('hidden');
+      startLevel(state.levelIndex + 1);
+    });
+
+    const labModal = document.getElementById('lab-modal');
+    document.getElementById('btn-home-lab').addEventListener('click', () => {
+      audio.playTileClick();
+      labModal.classList.remove('hidden');
+    });
+    document.getElementById('btn-game-lab').addEventListener('click', () => {
+      audio.playTileClick();
+      labModal.classList.remove('hidden');
+    });
+    document.getElementById('btn-close-lab').addEventListener('click', () => {
+      audio.playTileClick();
+      labModal.classList.add('hidden');
+    });
+
+    document.querySelectorAll('.lab-sfx-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.testSfx;
+        const rect = btn.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        if (type === 'select') audio.playTileClick();
+        if (type === 'match-bamboo') {
+          audio.playMatchSound(1);
+          spawnMatchParticles(cx, cy, 'bamboo');
+        }
+        if (type === 'match-sakura') {
+          audio.playMatchSound(4);
+          audio.speakCombo('Perfect');
+          spawnMatchParticles(cx, cy, 'sakura');
+        }
+        if (type === 'locked') {
+          audio.playLockedSound();
+          showModalToast('Locked by left and right 🔒');
+        }
+        if (type === 'door') audio.playDoorSlide();
+        if (type === 'bird') {
+          audio.init();
+          audio.playBirdChirp();
+        }
+        if (type === 'win') {
+          audio.playVictoryFanfare();
+          spawnVictoryConfetti();
+        }
+      });
+    });
+
+    function initApp() {
+      startLevel(0);
+
+      const splash = document.getElementById('splash-screen');
+      const fill = document.getElementById('splash-progress-fill');
+      const rollingTile = document.getElementById('splash-rolling-tile');
+      let prog = 20;
+      const splashInterval = setInterval(() => {
+        prog += 20;
+        if (prog >= 100) {
+          prog = 100;
+          clearInterval(splashInterval);
+          setTimeout(() => {
+            splash.style.opacity = '0';
+            splash.style.pointerEvents = 'none';
+            setTimeout(() => splash.classList.add('hidden'), 420);
+          }, 180);
+        }
+        fill.style.width = `${prog}%`;
+        const xPx = (prog / 100) * 230;
+        const deg = prog * 3.6;
+        rollingTile.style.transform = `translateX(${xPx}px) rotate(${deg}deg)`;
+      }, 120);
+
+      let countdownSec = 21 * 3600 + 59 * 60 + 42;
+      setInterval(() => {
+        countdownSec = Math.max(0, countdownSec - 1);
+        const h = String(Math.floor(countdownSec / 3600)).padStart(2, '0');
+        const m = String(Math.floor((countdownSec % 3600) / 60)).padStart(2, '0');
+        const s = String(countdownSec % 60).padStart(2, '0');
+        const el = document.getElementById('home-countdown');
+        if (el) el.textContent = `${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(initApp, 10);
+    } else {
+      window.addEventListener('DOMContentLoaded', initApp);
+    }
+  </script>
+</body>
+</html>
